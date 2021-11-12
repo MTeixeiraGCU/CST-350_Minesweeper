@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MinesweeperApp.BusinessServices;
 using MinesweeperApp.Models;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,15 @@ namespace MinesweeperApp.Controllers
 
         public IActionResult ProcessRegistration(User user)
         {
-            return Register(user);
+            RegistrationBusinessService rbs = new RegistrationBusinessService();
+            if (rbs.RegisterUser(user))
+            {
+                return View("RegistrationSuccess", user);
+            }
+            else
+            {
+                return View("RegistrationFailure", user);
+            }
         }
     }
 }

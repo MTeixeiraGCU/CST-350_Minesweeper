@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace MinesweeperApp.BusinessServices
 {
-    public class LoginBusinessService
+    public class RegistrationBusinessService
     {
         UserDAO userDAO = new UserDAO();
 
-        public bool ValidateLogin(UserLogin userLogin)
+        public bool RegisterUser(User user)
         {
-            if (userDAO.FindUserByUsernameAndPassword(userLogin))
+            if (userDAO.Add(user))
             {
-                userLogin.Id = userDAO.GetIdFromUsername(userLogin.Username);
+                user.Id = userDAO.GetIdFromUsername(user.Username);
                 return true;
             }
             return false;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,13 +10,32 @@ namespace MinesweeperApp.Models
     public class User
     {
         public int Id { get; set; }
+
+        [Required]
+        [StringLength(30, MinimumLength = 3)]
         public string FirstName { get; set; }
+
+        [Required]
+        [StringLength(30, MinimumLength = 3)]
         public string LastName { get; set; }
+
+        [Required]
         public string Sex { get; set; }
+
+        [Required]
+        [Range(5, 120)]
         public int Age { get; set; }
+
         public string State { get; set; }
+
+        [Required]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
         public string Email { get; set; }
+
+        [Required]
         public string Username { get; set; }
+
+        [Required]
         public string Password { get; set; }
 
         public User()
@@ -23,9 +43,9 @@ namespace MinesweeperApp.Models
             Id = -1;
             FirstName = "";
             LastName = "";
-            Sex = "None";
+            Sex = "Other";
             Age = 0;
-            State = "";
+            State = "None";
             Email = "";
             Username = "";
             Password = "";
@@ -34,13 +54,14 @@ namespace MinesweeperApp.Models
 
     public enum Gender
     {
-        Other,
-        Female,
-        Male
+        Other = 0,
+        Female = 1,
+        Male = 2
     }
 
     public enum States
     {
+        None,
         [Description("Alabama")]
         AL,
         [Description("Alaska")]

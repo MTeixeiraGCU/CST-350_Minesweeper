@@ -18,6 +18,7 @@ namespace MinesweeperApp.Controllers
         public IActionResult ProcessLogin(UserLogin userLogin)
         {
             LoginBusinessService lbs = new LoginBusinessService();
+
             if(lbs.ValidateLogin(userLogin))
             {
                 return View("LoginSuccess", userLogin);
