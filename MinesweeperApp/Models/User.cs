@@ -29,7 +29,7 @@ namespace MinesweeperApp.Models
         public string State { get; set; }
 
         [Required]
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email address format!")]
         public string Email { get; set; }
 
         [Required]
