@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 
 namespace MinesweeperApp.Controllers
 {
-    public class Game : Controller
+    public class GameController : Controller
     {
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult CreateBoard()
+        [HttpPost]
+        public IActionResult Index(string options)
         {
-            return View();
+            ViewBag.difficulty = options;
+            return View("CreateBoard");
         }
     }
 }

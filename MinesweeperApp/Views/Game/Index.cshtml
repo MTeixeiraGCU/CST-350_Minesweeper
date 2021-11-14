@@ -5,15 +5,15 @@
         <div class="col-md-4"></div>
 
         <div class="col-md-4">
-            <form asp-action="CreateBoard">
-                <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off">
-                <label class="btn btn-secondary" for="option1">Easy</label>
+            <form method="post">
+                <input type="radio" class="btn-check" name="options" id="easy" autocomplete="off" value="Easy">
+                <label class="btn btn-secondary" for="easy">Easy</label>
 
-                <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off">
-                <label class="btn btn-secondary" for="option2">Medium</label>
+                <input type="radio" class="btn-check" name="options" id="medium" autocomplete="off" value="Medium">
+                <label class="btn btn-secondary" for="medium">Medium</label>
 
-                <input type="radio" class="btn-check" name="options" id="option3" autocomplete="off">
-                <label class="btn btn-secondary" for="option3">Hard</label>
+                <input type="radio" class="btn-check" name="options" id="hard" autocomplete="off" value="Hard">
+                <label class="btn btn-secondary" for="hard">Hard</label>
                 <div class="form-group">
                     <input type="submit" value="Submit" class="btn btn-primary" />
                 </div>
