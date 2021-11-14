@@ -15,7 +15,7 @@ namespace MinesweeperApp.Controllers
             return View();
         }
 
-        public IActionResult ProcessLogin(UserLogin userLogin)
+        public IActionResult ProcessLogin(User userLogin)
         {
             LoginBusinessService lbs = new LoginBusinessService();
 

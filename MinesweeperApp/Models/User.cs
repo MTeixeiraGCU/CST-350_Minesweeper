@@ -38,18 +38,38 @@ namespace MinesweeperApp.Models
         [Required]
         public string Password { get; set; }
 
+        public User(int id, string firstName, string lastName, string sex, int age, string state, string email, string username, string password)
+        {
+            Id = id;
+            FirstName = firstName;
+            LastName = lastName;
+            Sex = sex;
+            Age = age;
+            State = state;
+            Email = email;
+            Username = username;
+            Password = password;
+        }
+
         public User()
         {
-            Id = -1;
-            FirstName = "";
-            LastName = "";
-            Sex = "Other";
-            Age = 0;
-            State = "None";
-            Email = "";
-            Username = "";
-            Password = "";
         }
+
+
+
+        /* public User()
+         {
+             Id = -1;
+             FirstName = "";
+             LastName = "";
+             Sex = "Other";
+             Age = 0;
+             State = "None";
+             Email = "";
+             Username = "";
+             Password = "";
+         }*/
+
     }
 
     public enum Gender

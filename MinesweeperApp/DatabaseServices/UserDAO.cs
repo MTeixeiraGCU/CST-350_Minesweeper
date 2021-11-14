@@ -11,18 +11,18 @@ namespace MinesweeperApp.DatabaseServices
     {
         string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
-        public bool FindUserByUsernameAndPassword(UserLogin userLogin)
+        public bool FindUserByUsernameAndPassword(User userLogin)
         {
             bool success = false;
             
-            string query = "SELECT * FROM dbo.users WHERE USERNAME = @username and PASSWORD = @password";
+            string query = "SELECT * FROM users WHERE USERNAME = @username and PASSWORD = @password";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.Add("@username", System.Data.SqlDbType.VarChar, 40).Value = userLogin.Username;
-                command.Parameters.Add("@password", System.Data.SqlDbType.VarChar, 40).Value = userLogin.Password;
+                command.Parameters.Add("@USERNAME", System.Data.SqlDbType.NChar, 40).Value = userLogin.Username;
+                command.Parameters.Add("@PASSWORD", System.Data.SqlDbType.NChar, 40).Value = userLogin.Password;
 
                 try
                 {
@@ -39,7 +39,7 @@ namespace MinesweeperApp.DatabaseServices
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                }
+                };
             }
 
             return success;

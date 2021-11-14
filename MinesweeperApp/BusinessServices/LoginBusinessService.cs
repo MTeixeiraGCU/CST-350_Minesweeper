@@ -11,7 +11,7 @@ namespace MinesweeperApp.BusinessServices
     {
         UserDAO userDAO = new UserDAO();
 
-        public bool ValidateLogin(UserLogin userLogin)
+        public bool ValidateLogin(User userLogin)
         {
             if (userDAO.FindUserByUsernameAndPassword(userLogin))
             {
