@@ -9,7 +9,12 @@ a.navbar-brand {
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+  color: #fff;
+}
+
+a:hover{
+    color: goldenrod;
+    text-decoration: underline;
 }
 
 .btn-primary {
@@ -22,6 +27,30 @@ a {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
+}
+
+.begin {
+    border: solid;
+    border-radius: 1rem;
+    color: #fff;
+    padding: .75rem 2rem;
+    text-align: center;
+    text-decoration: underline;
+    display: inline-block;
+    font-size: 16px;
+    background-color: rebeccapurple;
+    border-color: #fff;
+    -webkit-transition: background-color 2s ease-out;
+    -moz-transition: background-color 2s ease-out;
+    -o-transition: background-color 2s ease-out;
+    -webkit-transition: color 2s ease-out;
+    -moz-transition: color 2s ease-out;
+    -o-transition: color 2s ease-out;
+}
+
+.begin:hover{
+    background-color: #fff;
+    color:rebeccapurple;
 }
 
 /* Sticky footer styles
@@ -59,6 +88,7 @@ html {
 }
 
 body {
+   background-color:rebeccapurple;
   /* Margin bottom by footer height */
   margin-bottom: 60px;
 }
