@@ -54,22 +54,6 @@ namespace MinesweeperApp.Models
         public User()
         {
         }
-
-
-
-        /* public User()
-         {
-             Id = -1;
-             FirstName = "";
-             LastName = "";
-             Sex = "Other";
-             Age = 0;
-             State = "None";
-             Email = "";
-             Username = "";
-             Password = "";
-         }*/
-
     }
 
     public enum Gender
