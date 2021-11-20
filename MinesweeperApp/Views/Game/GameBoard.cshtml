@@ -1,0 +1,27 @@
+﻿@model IEnumerable<MinesweeperApp.Models.Cell>
+
+@{
+    string[] imageNames = { "blue-button.png", "red-button.png" };
+}
+
+<form>
+    <div>
+
+        @for (int i = 0; i < Model.Count(); i++)
+        {
+            if (i % ViewBag.Width == 0)
+            {
+                <div class="line-break"></div>
+            }
+
+            <button type="submit" value="@Model.ElementAt(i).Id" name="buttonNumber" asp-controller="Game" asp-action="HandleButtonClick">
+                <img src="~/img/@imageNames[Model.ElementAt(i).Visited ? 0 : 1]" />
+                <div>
+                    @Model.ElementAt(i).LiveNeighbors
+                </div>
+            </button>
+        }
+
+    </div>
+    <p>@ViewBag.Message</p>
+</form>

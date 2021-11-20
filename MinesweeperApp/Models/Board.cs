@@ -8,35 +8,58 @@ namespace MinesweeperApp.Models
     public class Board
     {
         public int Size { get; set; }
-        public Cell[,] Grid { get; set; }
         public int Difficulty { get; set; }
 
-        public float[] difficultySettings = { 0.12f, 0.14f, 0.16f };
+        public const int GRID_SIZE = 10;
 
-        public Board(int difficulty)
+        public List<Cell> Grid 
         {
-            Difficulty = difficulty;
-            Size = difficulty * 10;
-            Grid = new Cell[Size, Size];
+            get
+            {
+                List<Cell> cells = new List<Cell>();
+                for (int i = 0; i < Size; i++)
+                {
+                    for (int j = 0; j < Size; j++)
+                    {
+                        cells.Add(grid[i, j]);
+                    }
+                }
+                return cells;
+            } 
+        }
+
+        private Cell[,] grid;
+
+        private float[] difficultySettings = { 0.12f, 0.14f, 0.16f };
+
+        public Board()
+        {
+        }
+
+        public void CreateNewBoard(string difficulty)
+        {
+            Difficulty = getDifficultyFromString(difficulty);
+            Size = GRID_SIZE;
+            grid = new Cell[Size, Size];
             for (int i = 0; i < Size; i++)
             {
                 for (int j = 0; j < Size; j++)
                 {
                     //Id for each cell will be (row * width + col)
-                    Grid[i, j] = new Cell((i * Size) + j);
+                    grid[i, j] = new Cell((i * Size) + j);
                 }
             }
+
+            //create the mines on the board
+            setupLiveNeighbors();
+
+            //determine all the neighbor counts on the new board
+            calculateLiveNeighbors();
         }
 
         //This method sets up the game board with mines based on the current difficulty
-        public void SetupLiveNeighbors()
+        private void setupLiveNeighbors()
         {
-            //check for invalid difficulties and default to medium
-            if (Difficulty < 1 || Difficulty > 3)
-            {
-                Difficulty = 1;
-            }
-
             //random number generator
             var rand = new Random();
 
@@ -50,23 +73,23 @@ namespace MinesweeperApp.Models
                 var col = rand.Next(0, Size);
 
                 //check for previously placed mine
-                if (Grid[row, col].Mine)
+                if (grid[row, col].Mine)
                 {
                     //go back and try to place it again
                     i--;
                 }
                 else
                 {
-                    Grid[row, col].Mine = true;
+                    grid[row, col].Mine = true;
                 }
             }
         }
 
         //This method goes through each cell and calculates how many mines it is touching
-        public void CalculateLiveNeighbors()
+        private void calculateLiveNeighbors()
         {
             //loop through each Cell to populate its neighbors
-            foreach (var cell in Grid)
+            foreach (var cell in grid)
             {
                 //loop through each cell surrounding the current cell in a 3x3 Grid
                 for (int m = -1; m < 2; m++)
@@ -84,7 +107,7 @@ namespace MinesweeperApp.Models
                         }
 
                         //check for mine
-                        if (Grid[row, col].Mine)
+                        if (grid[row, col].Mine)
                         {
                             cell.LiveNeighbors++;
                         }
@@ -102,7 +125,7 @@ namespace MinesweeperApp.Models
         // This method checks the entire board for all visits to determine endgame status
         public bool CheckBoardVisits()
         {
-            foreach (var cell in Grid)
+            foreach (var cell in grid)
             {
                 //if the cell has not been visited and we are not a mine we are not finished
                 if (!cell.Visited && !cell.Mine)
@@ -114,24 +137,28 @@ namespace MinesweeperApp.Models
         }
 
         //This method visits a cell on the grid. It will return true if the cell was a mine otherwise false.
-        public bool MakeMove(int row, int col)
+        public bool MakeMove(int id)
         {
+            //grab the current cell's position
+            var row = id / Size;
+            var col = id % Size;
+
             if (!withinBounds(row, col))
             {
                 return false;
             }
 
             //visit the cell
-            Grid[row, col].Visited = true;
+            grid[row, col].Visited = true;
 
             //check for no neighbors
-            if (Grid[row, col].LiveNeighbors == 0)
+            if (grid[row, col].LiveNeighbors == 0)
             {
                 //recursively fill out all 0 neighbors cells
                 floodFill(row, col);
             }
 
-            return Grid[row, col].Mine;
+            return grid[row, col].Mine;
         }
 
         //Recursive function to find all empty neighbors and set them to visited
@@ -148,20 +175,41 @@ namespace MinesweeperApp.Models
                     }
 
                     //check if we have been to this cell already
-                    if (Grid[row + i, col + j].Visited)
+                    if (grid[row + i, col + j].Visited)
                     {
                         continue;
                     }
 
                     //visit the cell and check for continued recursion
-                    Grid[row + i, col + j].Visited = true;
+                    grid[row + i, col + j].Visited = true;
 
-                    if (Grid[row + i, col + j].LiveNeighbors == 0)
+                    if (grid[row + i, col + j].LiveNeighbors == 0)
                     {
                         floodFill(row + i, col + j);
                     }
                 }
             }
+        }
+
+        //Sets the difficulty based on the string name of each level
+        private int getDifficultyFromString(string difficutly)
+        {
+            //default level is medium
+            int difficutlyLevel = 2;
+
+            if (difficutly == "Easy")
+            {
+                difficutlyLevel = 1;
+            }
+            else if (difficutly == "Medium")
+            {
+                difficutlyLevel = 2;
+            }
+            else if (difficutly == "Hard")
+            {
+                difficutlyLevel = 3;
+            }
+            return difficutlyLevel;
         }
     }
 }
