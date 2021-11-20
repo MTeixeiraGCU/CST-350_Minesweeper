@@ -12,17 +12,30 @@ namespace MinesweeperApp.Controllers
     {
         public IActionResult Index()
         {
-            return Register(new User());
-        }
-
-        public IActionResult Register(User user)
-        {
-            return View("Index");
+            return View("Index", new User());
         }
 
         public IActionResult ProcessRegistration(User user)
         {
             RegistrationBusinessService rbs = new RegistrationBusinessService();
+
+            //Check for duplicate username
+            if(!rbs.CheckUsernameAvailability(user))
+            {
+                ModelState.AddModelError("Username", "That username has already been taken!");
+            }
+            //Check for duplicate email
+            if(!rbs.CheckEmailAvailability(user))
+            {
+                ModelState.AddModelError("Email", "That email has been used for another account already!");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Index", new User());
+            }
+
+            //register user
             if (rbs.RegisterUser(user))
             {
                 return View("RegistrationSuccess", user);

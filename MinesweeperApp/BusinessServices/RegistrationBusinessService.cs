@@ -20,5 +20,19 @@ namespace MinesweeperApp.BusinessServices
             }
             return false;
         }
+
+        public bool CheckUsernameAvailability(User user)
+        {
+            if (userDAO.GetIdFromUsername(user.Username) == -1)
+                return true;
+            return false;
+        }
+
+        public bool CheckEmailAvailability(User user)
+        {
+            if (userDAO.GetIdFromEmail(user.Email) == -1)
+                return true;
+            return false;
+        }
     }
 }

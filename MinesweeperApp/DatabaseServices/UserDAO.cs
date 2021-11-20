@@ -79,6 +79,40 @@ namespace MinesweeperApp.DatabaseServices
             return id;
         }
 
+        public int GetIdFromEmail(string email)
+        {
+            int id = -1;
+
+            string query = "SELECT * FROM dbo.users WHERE EMAIL = @email";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.Add("@email", System.Data.SqlDbType.VarChar, 40).Value = email;
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        id = Convert.ToInt32(reader.GetValue(0));
+                    }
+
+                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            return id;
+        }
+
         public bool Add(User user)
         {
             bool success = false;
