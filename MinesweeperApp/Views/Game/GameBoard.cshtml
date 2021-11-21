@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<MinesweeperApp.Models.Cell>
 
 @{
-    string[] imageNames = { "blue-button.png", "red-button.png" };
+    string[] imageNames = { "blue-button.png", "red-button.png", "bomb.png", "flag.png"};
 }
 
 <form>
@@ -17,7 +17,10 @@
             <button type="submit" value="@Model.ElementAt(i).Id" name="buttonNumber" asp-controller="Game" asp-action="HandleButtonClick">
                 <img src="~/img/@imageNames[Model.ElementAt(i).Visited ? 0 : 1]" />
                 <div>
+                    @if (Model.ElementAt(i).Visited)
+                    {
                     @Model.ElementAt(i).LiveNeighbors
+                    }
                 </div>
             </button>
         }

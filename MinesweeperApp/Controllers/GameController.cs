@@ -29,7 +29,16 @@ namespace MinesweeperApp.Controllers
         public IActionResult HandleButtonClick(string buttonNumber)
         {
             int id = int.Parse(buttonNumber);
-            GameBoard.MakeMove(id);
+            bool lose = GameBoard.MakeMove(id);
+            bool win = GameBoard.CheckBoardVisits();
+
+            if (lose)
+            {
+                return View("EndGame");
+            } else if (win)
+            {
+                return View("Winner");
+            }
 
             ViewBag.Width = GameBoard.Size;
             return View("GameBoard", GameBoard.Grid);

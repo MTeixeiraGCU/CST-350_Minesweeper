@@ -42,20 +42,36 @@
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label" style="color: #fff"></label>
-                <input asp-for="Password" type="password" class="form-control" />
+                <input asp-for="Password" type="password" class="form-control" id="Password" onkeyup="verify()"/>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label for="ReenterPassword" class="control-label" style="color: #fff">Re-Enter Password</label>
-                <input id="ReenterPassword" type="password" class="form-control" />
-                <span id="ReenterPasswordErrors" class="text-danger"></span>
+                <label for="Password2" class="control-label" style="color: #fff">Re-Enter Password</label>
+                <input id="Password2" type="password" class="form-control" onkeyup="verify()"/>
+                <span id="Password2Errors"></span>
+
             </div>
             <div class="form-group">
-                <input type="submit" value="Register" class="btn btn-primary" />
+                <input type="submit" id="register" value="Register" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
+
+<script type="text/javascript">
+    function verify() {
+        if (document.getElementById("Password").value == document.getElementById("Password2").value) {
+            document.getElementById('Password2Errors').innerHTML = 'matching';
+            document.getElementById('register').disabled = false;
+            document.getElementById('Password2Errors').style.color = 'gold';
+
+        } else {
+            document.getElementById('Password2Errors').style.color = 'red';
+            document.getElementById('Password2Errors').innerHTML = 'not matching';
+            document.getElementById('register').disabled = true;
+        }
+    }
+</script>
 
 <div>
     <a asp-action="Index">Back to Top</a>
