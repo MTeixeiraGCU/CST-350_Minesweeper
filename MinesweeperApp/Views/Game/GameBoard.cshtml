@@ -47,13 +47,25 @@
             {
                 <div class="line-break"></div>
             }
+<<<<<<< Updated upstream
             <button class="game-button" type="submit" value="@Model.ElementAt(i).Id" name="buttonNumber" asp-controller="Game" asp-action="HandleButtonClick">
                 <img class="button-image" src="~/img/@imageNames[Model.ElementAt(i).Visited ? 0 : 1]" />
                 <div class="centered-text">
                     @if (Model.ElementAt(i).Visited && Model.ElementAt(i).LiveNeighbors != 0)
                     {
                         @Model.ElementAt(i).LiveNeighbors
+=======
+            
+            <button type="submit" value="@Model.ElementAt(i).Id" name="buttonNumber" asp-controller="Game" asp-action="HandleButtonClick">
+                <img class="img-fluid" src="~/img/@imageNames[Model.ElementAt(i).Visited ? 0 : 1]" />
+                <div>
+                    @if (Model.ElementAt(i).Visited)
+                    {
+                        
+                    @Model.ElementAt(i).LiveNeighbors
+>>>>>>> Stashed changes
                     }
+                   
                 </div>
             </button>
         }
