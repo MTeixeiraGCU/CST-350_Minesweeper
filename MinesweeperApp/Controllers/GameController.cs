@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MinesweeperApp.BusinessServices;
 using MinesweeperApp.Models;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace MinesweeperApp.Controllers
 {
     public class GameController : Controller
     {
-        static Board GameBoard = new Board();
+        static GameboardBusinessService gbs = new GameboardBusinessService();
 
         public IActionResult Index()
         {
@@ -19,18 +20,18 @@ namespace MinesweeperApp.Controllers
         [HttpPost]
         public IActionResult CreateBoard(string options)
         {
-            //create a new board
-            GameBoard.CreateNewBoard(options);
+            gbs.NewGame(options);
+            
 
-            ViewBag.Width = GameBoard.Size;
-            return View("GameBoard", GameBoard.Grid);
+            ViewBag.Width = gbs.Size;
+            return View("GameBoard", gbs.Grid);
         }
 
         public IActionResult HandleButtonClick(string buttonNumber)
         {
             int id = int.Parse(buttonNumber);
-            bool lose = GameBoard.MakeMove(id);
-            bool win = GameBoard.CheckBoardVisits();
+            bool lose = gbs.MakeMove(id);
+            bool win = gbs.CheckBoardVisits();
 
             if (lose)
             {
@@ -40,8 +41,8 @@ namespace MinesweeperApp.Controllers
                 return View("Winner");
             }
 
-            ViewBag.Width = GameBoard.Size;
-            return View("GameBoard", GameBoard.Grid);
+            ViewBag.Width = gbs.Size;
+            return View("GameBoard", gbs.Grid);
         }
     }
 }
