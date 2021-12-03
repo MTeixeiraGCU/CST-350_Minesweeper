@@ -2,13 +2,14 @@
 
 <style>
     .game-button {
-        position: relative;
-        text-align: center;
-        width: 10%;
         border: none;
     }
 
     .button-image {
+        width: 100%;
+    }
+
+    .button-overlay-image {
         width: 100%;
     }
 
@@ -20,6 +21,13 @@
     .line-break {
         flex-basis: 100%;
         height: 0;
+    }
+
+    .single-button {
+        position: relative;
+        text-align: center;
+        width: 10%;
+        border: none;
     }
 
     .centered-text {
@@ -38,7 +46,7 @@
     string[] imageNames = { "blue-button.png", "red-button.png", "bomb.png", "flag.png"};
 }
 
-<form style="margin: auto; width: 80%">
+<form class="game-form" style="margin: auto; width: 80%">
     <div class="grid-area">
 
         @for (int i = 0; i < Model.Count(); i++)
@@ -47,15 +55,21 @@
             {
                 <div class="line-break"></div>
             }
-            <button class="game-button" type="submit" value="@Model.ElementAt(i).Id" name="buttonNumber" asp-controller="Game" asp-action="HandleButtonClick">
-                <img class="button-image" src="~/img/@imageNames[Model.ElementAt(i).Visited ? 0 : 1]" />
-                <div class="centered-text">
-                    @if (Model.ElementAt(i).Visited && Model.ElementAt(i).LiveNeighbors != 0)
-                    {
-                        @Model.ElementAt(i).LiveNeighbors
-                    }
-                </div>
-            </button>
+            <div class="single-button" id=@i>
+                <button class="game-button" type="submit" value="@Model.ElementAt(i).Id" name="buttonNumber" asp-controller="Game" asp-action="HandleButtonClick">
+                    <img class="button-image" src="~/img/@imageNames[Model.ElementAt(i).Visited ? 0 : 1]" />
+                    <div class="centered-text">
+                        @if (Model.ElementAt(i).Visited && Model.ElementAt(i).LiveNeighbors != 0 && !Model.ElementAt(i).Mine)
+                        {
+                            @Model.ElementAt(i).LiveNeighbors
+                        }
+                        else if (Model.ElementAt(i).Flagged)
+                        {
+                            <img class="button-overlay-image" src="~/img/@imageNames[3]" />
+                        }
+                    </div>
+                </button>
+            </div>
         }
 
     </div>

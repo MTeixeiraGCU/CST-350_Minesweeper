@@ -1,0 +1,23 @@
+﻿@model MinesweeperApp.Models.Cell
+
+@{
+    string[] imageNames = { "blue-button.png", "red-button.png", "bomb.png", "flag.png" };
+}
+
+<button class="game-button" type="submit" value="@Model.Id" name="buttonNumber" asp-controller="Game" asp-action="HandleButtonClick">
+    <img class="button-image" src="~/img/@imageNames[Model.Visited ? 0 : 1]" />
+    <div class="centered-text">
+        @if (Model.Visited && Model.LiveNeighbors != 0 && !Model.Mine)
+        {
+            @Model.LiveNeighbors
+        }
+        else if (Model.Visited && Model.Mine)
+        {
+            <img class="button-overlay-image" src="~/img/@imageNames[2]" />
+        }
+        else if (Model.Flagged)
+        {
+            <img class="button-overlay-image" src="~/img/@imageNames[3]" />
+        }
+    </div>
+</button>

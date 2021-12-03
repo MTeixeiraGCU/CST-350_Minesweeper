@@ -12,6 +12,8 @@ namespace MinesweeperApp.Controllers
     {
         static GameboardBusinessService gbs = new GameboardBusinessService();
 
+        private List<int> updatedCells;
+
         public IActionResult Index()
         {
             return View();
@@ -29,28 +31,50 @@ namespace MinesweeperApp.Controllers
         public IActionResult HandleButtonClick(string buttonNumber)
         {
             int id = int.Parse(buttonNumber);
-            bool lose = gbs.MakeMove(id);
-            bool win = gbs.CheckBoardVisits();
 
-            if (lose)
-            {
-                return View("EndGame");
-            } else if (win)
-            {
-                return View("Winner");
-            }
+            gbs.MakeMove(id);
 
             ViewBag.Width = gbs.Size;
             return View("GameBoard", gbs.Grid);
         }
 
-        public IActionResult HandleButtonRightClick(string buttonNumber)
+        public JsonResult HandleButtonLeftClick(string buttonNumber)
+        {
+            int id = int.Parse(buttonNumber);
+            updatedCells = new List<int>();
+
+            gbs.MakeMove(id, updateCell);
+
+            ViewBag.Width = gbs.Size;
+            return  Json(updatedCells);
+        }
+
+        public JsonResult HandleButtonRightClick(string buttonNumber)
+        {
+            int id = int.Parse(buttonNumber);
+            updatedCells = new List<int>();
+
+            gbs.ToggleFlag(id);
+            updatedCells.Add(id);
+
+            return Json(updatedCells);
+        }
+
+        public IActionResult UpdateOneCell(string buttonNumber)
         {
             int id = int.Parse(buttonNumber);
 
-            gbs.ToggleFlag(id);
-
             return PartialView("SingleButton", gbs.Grid.ElementAt(id));
+        }
+
+        public bool CheckGrid()
+        {
+            return gbs.CheckBoardVisits();
+        }
+
+        public void updateCell(int id)
+        {
+            updatedCells.Add(id);
         }
     }
 }

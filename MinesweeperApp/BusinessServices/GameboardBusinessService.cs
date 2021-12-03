@@ -14,6 +14,7 @@ namespace MinesweeperApp.BusinessServices
             }
         }
 
+        public delegate void RevealCell(int id);
 
         private const int GRID_SIZE = 10;
         private float[] DifficultySettings = { 0.12f, 0.14f, 0.16f };
@@ -85,6 +86,39 @@ namespace MinesweeperApp.BusinessServices
                 }
             }
             return true;
+        }
+
+        //This method visits a cell on the grid. It will return true if the cell was a mine otherwise false. (ignores flagged cells)
+        public bool MakeMove(int id, RevealCell revealCell = null)
+        {
+            //grab the current cell's position
+            var row = id / gameBoard.Size;
+            var col = id % gameBoard.Size;
+
+            if (!withinBounds(row, col))
+            {
+                return false;
+            }
+
+            //check for flag or a previous visit
+            if (gameBoard.Grid[row, col].Flagged || gameBoard.Grid[row, col].Visited)
+            {
+                return false;
+            }
+
+            //visit the cell
+            gameBoard.Grid[row, col].Visited = true;
+            if(revealCell != null)
+                revealCell((row * gameBoard.Size) + col);
+
+            //check for no neighbors
+            if (gameBoard.Grid[row, col].LiveNeighbors == 0)
+            {
+                //recursively fill out all 0 neighbors cells
+                floodFill(row, col, revealCell);
+            }
+
+            return gameBoard.Grid[row, col].Mine;
         }
 
         //This method clears the given board grid andsizes the new one based on the inputted size
@@ -165,39 +199,8 @@ namespace MinesweeperApp.BusinessServices
             return row >= 0 && col >= 0 && row < gameBoard.Size && col < gameBoard.Size;
         }
 
-        //This method visits a cell on the grid. It will return true if the cell was a mine otherwise false. (ignores flagged cells)
-        public bool MakeMove(int id)
-        {
-            //grab the current cell's position
-            var row = id / gameBoard.Size;
-            var col = id % gameBoard.Size;
-
-            if (!withinBounds(row, col))
-            {
-                return false;
-            }
-
-            //check for flag
-            if (gameBoard.Grid[row, col].Flagged)
-            {
-                return false;
-            }
-
-            //visit the cell
-            gameBoard.Grid[row, col].Visited = true;
-
-            //check for no neighbors
-            if (gameBoard.Grid[row, col].LiveNeighbors == 0)
-            {
-                //recursively fill out all 0 neighbors cells
-                floodFill(row, col);
-            }
-
-            return gameBoard.Grid[row, col].Mine;
-        }
-
         //Recursive function to find all empty neighbors and set them to visited
-        private void floodFill(int row, int col)
+        private void floodFill(int row, int col, RevealCell revealCell = null)
         {
             for (int i = -1; i < 2; i++)
             {
@@ -217,10 +220,12 @@ namespace MinesweeperApp.BusinessServices
 
                     //visit the cell and check for continued recursion
                     gameBoard.Grid[row + i, col + j].Visited = true;
+                    if(revealCell != null)
+                        revealCell(((row + i) * gameBoard.Size) + col + j);
 
                     if (gameBoard.Grid[row + i, col + j].LiveNeighbors == 0)
                     {
-                        floodFill(row + i, col + j);
+                        floodFill(row + i, col + j, revealCell);
                     }
                 }
             }
