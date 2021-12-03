@@ -58,6 +58,35 @@ namespace MinesweeperApp.BusinessServices
             calculateLiveNeighbors();
         }
 
+        //This method toggles the flagged status of a given cell
+        public void ToggleFlag(int id)
+        {
+            //grab the current cell's position
+            var row = id / gameBoard.Size;
+            var col = id % gameBoard.Size;
+
+            //check bounds first
+            if (withinBounds(row, col))
+            {
+                //toggle flag
+                gameBoard.Grid[row, col].Flagged = !gameBoard.Grid[row, col].Flagged;
+            }
+        }
+
+        // This method checks the entire board for all visits to determine endgame status
+        public bool CheckBoardVisits()
+        {
+            foreach (var cell in gameBoard.Grid)
+            {
+                //if the cell has not been visited and we are not a mine we are not finished
+                if (!cell.Visited && !cell.Mine)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         //This method clears the given board grid andsizes the new one based on the inputted size
         private void clearGrid(int size)
         {
@@ -136,21 +165,7 @@ namespace MinesweeperApp.BusinessServices
             return row >= 0 && col >= 0 && row < gameBoard.Size && col < gameBoard.Size;
         }
 
-        // This method checks the entire board for all visits to determine endgame status
-        public bool CheckBoardVisits()
-        {
-            foreach (var cell in gameBoard.Grid)
-            {
-                //if the cell has not been visited and we are not a mine we are not finished
-                if (!cell.Visited && !cell.Mine)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        //This method visits a cell on the grid. It will return true if the cell was a mine otherwise false.
+        //This method visits a cell on the grid. It will return true if the cell was a mine otherwise false. (ignores flagged cells)
         public bool MakeMove(int id)
         {
             //grab the current cell's position
@@ -158,6 +173,12 @@ namespace MinesweeperApp.BusinessServices
             var col = id % gameBoard.Size;
 
             if (!withinBounds(row, col))
+            {
+                return false;
+            }
+
+            //check for flag
+            if (gameBoard.Grid[row, col].Flagged)
             {
                 return false;
             }
@@ -188,8 +209,8 @@ namespace MinesweeperApp.BusinessServices
                         continue;
                     }
 
-                    //check if we have been to this cell already
-                    if (gameBoard.Grid[row + i, col + j].Visited)
+                    //check if we have been to this cell already or if it is flagged
+                    if (gameBoard.Grid[row + i, col + j].Visited || gameBoard.Grid[row + i, col + j].Flagged)
                     {
                         continue;
                     }

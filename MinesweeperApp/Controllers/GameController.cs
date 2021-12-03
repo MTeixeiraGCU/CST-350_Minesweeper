@@ -21,7 +21,6 @@ namespace MinesweeperApp.Controllers
         public IActionResult CreateBoard(string options)
         {
             gbs.NewGame(options);
-            
 
             ViewBag.Width = gbs.Size;
             return View("GameBoard", gbs.Grid);
@@ -43,6 +42,15 @@ namespace MinesweeperApp.Controllers
 
             ViewBag.Width = gbs.Size;
             return View("GameBoard", gbs.Grid);
+        }
+
+        public IActionResult HandleButtonRightClick(string buttonNumber)
+        {
+            int id = int.Parse(buttonNumber);
+
+            gbs.ToggleFlag(id);
+
+            return PartialView("SingleButton", gbs.Grid.ElementAt(id));
         }
     }
 }

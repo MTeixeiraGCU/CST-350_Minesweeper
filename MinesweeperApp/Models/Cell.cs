@@ -10,6 +10,7 @@ namespace MinesweeperApp.Models
         public int Id { get; set; }
         public bool Visited { get; set; }
         public bool Mine { get; set; }
+        public bool Flagged { get; set; }
         public int LiveNeighbors { get; set; }
 
         public Cell()
@@ -21,6 +22,7 @@ namespace MinesweeperApp.Models
             Id = id;
             Visited = false;
             Mine = false;
+            Flagged = false;
             LiveNeighbors = 0;
         }
     }
