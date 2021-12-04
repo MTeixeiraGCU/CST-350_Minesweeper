@@ -17,13 +17,13 @@ namespace MinesweeperApp.Models
         {
         }
 
-        public Cell(int id)
+        public Cell(int id, bool visited = false, bool mine = false, bool flagged = false, int liveNeighbors = 0)
         {
             Id = id;
-            Visited = false;
-            Mine = false;
-            Flagged = false;
-            LiveNeighbors = 0;
+            Visited = visited;
+            Mine = mine;
+            Flagged = flagged;
+            LiveNeighbors = liveNeighbors;
         }
     }
 }
