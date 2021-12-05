@@ -36,7 +36,8 @@ namespace MinesweeperApp.Controllers
         {
             int id = int.Parse(buttonNumber);
 
-            gbs.MakeMove(id);
+            //disabled because of the new ajax calls
+            //gbs.MakeMove(id);
 
             ViewBag.Width = gbs.Size;
             return View("GameBoard", gbs.Grid);
@@ -51,6 +52,12 @@ namespace MinesweeperApp.Controllers
             {
                 Lost = gbs.MakeMove(id, updateCell);
                 Won = gbs.CheckForWin();
+            }
+
+            //we lost so show the entire grid
+            if(Lost)
+            {
+                gbs.RevealAll(updateCell);
             }
 
             ViewBag.Width = gbs.Size;
@@ -103,7 +110,8 @@ namespace MinesweeperApp.Controllers
 
         public void updateCell(int id)
         {
-            updatedCells.Add(id);
+            if(!updatedCells.Contains(id))
+                updatedCells.Add(id);
         }
 
     }

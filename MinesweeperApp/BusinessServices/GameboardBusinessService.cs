@@ -126,7 +126,19 @@ namespace MinesweeperApp.BusinessServices
             return gameBoard.Grid[row, col].Mine;
         }
 
-        //This method clears the given board grid andsizes the new one based on the inputted size
+        public void RevealAll(RevealCell revealCell)
+        {
+            foreach (var cell in gameBoard.Grid)
+            {
+                if (!cell.Visited)
+                {
+                    cell.Visited = true;
+                    revealCell(cell.Id);
+                }
+            }
+        }
+
+        //This method clears the given board grid and sizes the new one based on the inputted size
         private void clearGrid(int size)
         {
             gameBoard.Grid = new Cell[size, size];

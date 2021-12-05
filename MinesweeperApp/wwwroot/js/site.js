@@ -16,22 +16,21 @@
             case 1:
                 var buttonNumber = $(this).val();
                 console.log("Button number " + buttonNumber + " was left clicked");
-                doButtonUpdate(buttonNumber, "/game/HandleButtonLeftClick");
+                doButtonUpdate(buttonNumber, "/game/HandleButtonLeftClick", updateCells);
                 break;
             case 2:
                 var buttonNumber = $(this).val();
                 console.log("Button number " + buttonNumber + " was right clicked");
-                doButtonUpdate(buttonNumber, "/game/HandleButtonRightClick");
+                doButtonUpdate(buttonNumber, "/game/HandleButtonRightClick", updateCells);
                 break;
             default:
                 console.log("That control is not supported!")
         }
     });
-
 });
 
 //processes a button left or right click
-function doButtonUpdate(buttonNumber, urlString) {
+function doButtonUpdate(buttonNumber, urlString, cellCallback) {
     $.ajax({
         dataType: "json",
         url: urlString,
@@ -40,10 +39,7 @@ function doButtonUpdate(buttonNumber, urlString) {
         },
         success: function (data) {
             console.log(data);
-            for (var i = 0; i < data.length; i++) {
-                updateCell(data[i]);
-            }
-            checkWinCondition(buttonNumber);
+            cellCallback(data);
         },
         error: function (jq, textError, errorMsg) {
             console.log(textError + " : " + errorMsg);
@@ -51,10 +47,19 @@ function doButtonUpdate(buttonNumber, urlString) {
     });
 };
 
+function updateCells(cells) {
+    var promises = [];
+
+    cells.forEach(function (cell) {
+        promises.push(updateCell(cell));
+    });
+    Promise.all(promises).then(checkWinCondition);
+}
+
 //this method will cycle through and update all the cells images
 function updateCell(buttonNumber) {
-    
-    $.ajax({
+    return $.ajax({
+        type: 'GET',
         dataType: "text",
         url: "/game/UpdateOneCell",
         data: {
@@ -67,12 +72,13 @@ function updateCell(buttonNumber) {
         },
         error: function (jq, textError, errorMsg) {
             console.log(textError + " : " + errorMsg);
-        }
+        },
+        timeout: 1000
     });
 }
 
 //checks for a win condition on the game board
-function checkWinCondition(buttonNumber) {
+function checkWinCondition() {
     $.ajax({
         type: 'GET',
         dataType: "text",

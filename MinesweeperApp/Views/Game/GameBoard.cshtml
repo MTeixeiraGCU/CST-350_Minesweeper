@@ -67,6 +67,10 @@
                         {
                             @Model.ElementAt(i).LiveNeighbors
                         }
+                        else if (Model.ElementAt(i).Visited && Model.ElementAt(i).Mine)
+                        {
+                            <img class="button-overlay-image" src="~/img/@imageNames[2]" />
+                        }
                         else if (Model.ElementAt(i).Flagged)
                         {
                             <img class="button-overlay-image" src="~/img/@imageNames[3]" />
