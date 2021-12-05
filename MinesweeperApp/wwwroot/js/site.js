@@ -43,7 +43,7 @@ function doButtonUpdate(buttonNumber, urlString) {
             for (var i = 0; i < data.length; i++) {
                 updateCell(data[i]);
             }
-            checkWinCondition();
+            checkWinCondition(buttonNumber);
         },
         error: function (jq, textError, errorMsg) {
             console.log(textError + " : " + errorMsg);
@@ -72,14 +72,25 @@ function updateCell(buttonNumber) {
 }
 
 //checks for a win condition on the game board
-function checkWinCondition() {
+function checkWinCondition(buttonNumber) {
     $.ajax({
         type: 'GET',
         dataType: "text",
-        url: '/game/CheckGrid',
+        url: '/game/CheckGrid?id=' + buttonNumber,
         success: function (result) {
             console.log("Game status is : " + result);
-            //TODO: add page loading here for a win
+            
+            if (result == "2") {
+
+            } else if (result == "0") {
+                var url = "https://localhost:44343/Game/winner";
+                $(location).attr('href', url);
+            } else if (result == "1") {
+                var url = "https://localhost:44343/Game/EndGame";
+                $(location).attr('href', url);
+
+            }
+
         },
         error: function (jq, textError, errorMsg) {
             console.log(textError + " : " + errorMsg);

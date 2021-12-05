@@ -75,17 +75,46 @@ namespace MinesweeperApp.BusinessServices
         }
 
         // This method checks the entire board for all visits to determine endgame status
-        public bool CheckBoardVisits()
+        public bool CheckForWin(int id)
         {
+            int counter = 0;
+
             foreach (var cell in gameBoard.Grid)
             {
-                //if the cell has not been visited and we are not a mine we are not finished
-                if (!cell.Visited && !cell.Mine)
+                if (cell.Visited && !cell.Mine || cell.Flagged && !cell.Mine)
+                {
+                    counter++;
+                } else if (cell.Visited && cell.Mine)
                 {
                     return false;
                 }
             }
-            return true;
+
+            if (counter > 100)
+                return true;
+            else
+                return false;
+
+           
+        }
+
+        public bool CheckForLoss(int id)
+        {
+
+            //grab the current cell's position
+            var row = id / gameBoard.Size;
+            var col = id % gameBoard.Size;
+
+            //check bounds first
+            if (withinBounds(row, col))
+            {
+                if (gameBoard.Grid[row, col].Mine)
+                    return true;
+                else
+                    return false;
+            }
+
+            return false;
         }
 
         //This method visits a cell on the grid. It will return true if the cell was a mine otherwise false. (ignores flagged cells)

@@ -67,14 +67,26 @@ namespace MinesweeperApp.Controllers
             return PartialView("SingleButton", gbs.Grid.ElementAt(id));
         }
 
-        public bool CheckGrid()
+        public int CheckGrid(int id)
         {
-            return gbs.CheckBoardVisits();
+            if (gbs.CheckForWin(id))
+            {
+                return 0;
+            } else if (gbs.CheckForLoss(id))
+            {
+                return 1;
+            }
+            return 2;
         }
 
         public void updateCell(int id)
         {
             updatedCells.Add(id);
+        }
+
+        public IActionResult Winner()
+        {
+            return View("Winner");
         }
     }
 }
