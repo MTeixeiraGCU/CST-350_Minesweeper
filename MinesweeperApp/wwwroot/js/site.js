@@ -76,26 +76,22 @@ function checkWinCondition(buttonNumber) {
     $.ajax({
         type: 'GET',
         dataType: "text",
-        url: '/game/CheckGrid?id=' + buttonNumber,
+        url: '/game/CheckGrid',
         success: function (result) {
             console.log("Game status is : " + result);
             
-            if (result == "2") {
-
-            } else if (result == "0") {
-                var url = "https://localhost:44343/Game/winner";
+            if (result == "0") {
+                var url = "Winner";
+                alert("Congrats!");
                 $(location).attr('href', url);
             } else if (result == "1") {
-                var url = "https://localhost:44343/Game/EndGame";
+                var url = "EndGame";
+                alert("You stepped on a mine!");
                 $(location).attr('href', url);
-
             }
-
         },
         error: function (jq, textError, errorMsg) {
             console.log(textError + " : " + errorMsg);
         }
     });
-
-    console.log("Page loaded and ready!");
 };

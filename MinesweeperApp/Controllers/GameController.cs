@@ -11,6 +11,8 @@ namespace MinesweeperApp.Controllers
     public class GameController : Controller
     {
         static GameboardBusinessService gbs = new GameboardBusinessService();
+        static bool Lost;
+        static bool Won;
 
         private List<int> updatedCells;
 
@@ -23,6 +25,8 @@ namespace MinesweeperApp.Controllers
         public IActionResult CreateBoard(string options)
         {
             gbs.NewGame(options);
+            Lost = false;
+            Won = false;
 
             ViewBag.Width = gbs.Size;
             return View("GameBoard", gbs.Grid);
@@ -43,7 +47,11 @@ namespace MinesweeperApp.Controllers
             int id = int.Parse(buttonNumber);
             updatedCells = new List<int>();
 
-            gbs.MakeMove(id, updateCell);
+            if (!Lost && !Won)
+            {
+                Lost = gbs.MakeMove(id, updateCell);
+                Won = gbs.CheckForWin();
+            }
 
             ViewBag.Width = gbs.Size;
             return  Json(updatedCells);
@@ -54,8 +62,12 @@ namespace MinesweeperApp.Controllers
             int id = int.Parse(buttonNumber);
             updatedCells = new List<int>();
 
-            gbs.ToggleFlag(id);
-            updatedCells.Add(id);
+            if (!Lost && !Won)
+            {
+                gbs.ToggleFlag(id);
+                Won = gbs.CheckForWin();
+                updatedCells.Add(id);
+            }
 
             return Json(updatedCells);
         }
@@ -66,13 +78,23 @@ namespace MinesweeperApp.Controllers
 
             return PartialView("SingleButton", gbs.Grid.ElementAt(id));
         }
-
-        public int CheckGrid(int id)
+        public IActionResult Winner()
         {
-            if (gbs.CheckForWin(id))
+            return View("Winner");
+        }
+
+        public IActionResult EndGame()
+        {
+            return View("EndGame");
+        }
+
+        public int CheckGrid()
+        {
+            if(Won)
             {
                 return 0;
-            } else if (gbs.CheckForLoss(id))
+            }
+            else if(Lost)
             {
                 return 1;
             }
@@ -84,9 +106,5 @@ namespace MinesweeperApp.Controllers
             updatedCells.Add(id);
         }
 
-        public IActionResult Winner()
-        {
-            return View("Winner");
-        }
     }
 }
