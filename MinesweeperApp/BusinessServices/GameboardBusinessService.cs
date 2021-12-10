@@ -1,4 +1,5 @@
-﻿using MinesweeperApp.Models;
+﻿using MinesweeperApp.DatabaseServices;
+using MinesweeperApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace MinesweeperApp.BusinessServices
 
         private const int GRID_SIZE = 10;
         private float[] DifficultySettings = { 0.12f, 0.14f, 0.16f };
+
+        private static GameBoardDAO gbDAO = new GameBoardDAO();
 
         public List<Cell> Grid
         {
@@ -42,12 +45,44 @@ namespace MinesweeperApp.BusinessServices
             gameBoard = new Board();
         }
 
+        //this method will save or update the current game with the given userId
+        public void SaveGame(int userId)
+        {
+            gameBoard.TimePlayed = DateTime.Now - gameBoard.TimeStarted;
+            if(gameBoard.Id >= 0)
+            {
+                //update previous game here
+            }
+            else
+            {
+                //new game save
+                gameBoard.Id = gbDAO.SaveBoard(gameBoard, userId);
+            }
+            
+            if(gameBoard.Id >= 0) //we have a good save in the database
+            {
+                for (int i = 0; i < gameBoard.Size * gameBoard.Size; i++)
+                {
+                    gbDAO.SaveCells(gameBoard.Grid[i / gameBoard.Size, i % gameBoard.Size], gameBoard.Id);
+                }
+            }
+        }
+
+        //This method attempts to load a game from the given id
+        public void LoadGame(int boardId)
+        {
+            gameBoard = gbDAO.LoadBoard(boardId); //may return null
+            if (gameBoard != null)
+                gameBoard.Grid = gbDAO.LoadCells(gameBoard);
+        }
+
         //This method initiates a new game and randomizes the mines on the grid based off of the difficulty
         public void NewGame(string difficulty)
         {
             //create a new board
             gameBoard.Difficulty = getDifficultyFromString(difficulty);
             gameBoard.Size = GRID_SIZE;
+            gameBoard.TimeStarted = DateTime.Now;
             
             //clears the existing grid to a certain size
             clearGrid(gameBoard.Size);
@@ -136,6 +171,11 @@ namespace MinesweeperApp.BusinessServices
                     revealCell(cell.Id);
                 }
             }
+        }
+
+        public DateTime GetStartTime()
+        {
+            return gameBoard.TimeStarted;
         }
 
         //This method clears the given board grid and sizes the new one based on the inputted size

@@ -5,19 +5,19 @@ using System.Threading.Tasks;
 
 namespace MinesweeperApp.Models
 {
-    public class Board
+    public class BoardDTO
     {
         public int Id { get; set; }
-        public int Size { get; set; }
         public int Difficulty { get; set; }
-        public int NumberOfMines { get; set; }
-        public Cell[,] Grid;
         public DateTime TimeStarted { get; set; }
         public TimeSpan TimePlayed { get; set; }
 
-        public Board()
+        public BoardDTO(int id, int difficulty, DateTime timeStarted, TimeSpan timePlayed)
         {
-            Id = -1; //used to see if this is a new game or previous save
+            Id = id;
+            Difficulty = difficulty;
+            TimeStarted = timeStarted;
+            TimePlayed = timePlayed;
         }
     }
 }

@@ -21,8 +21,8 @@ namespace MinesweeperApp.DatabaseServices
             {
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.Add("@USERNAME", System.Data.SqlDbType.NChar, 40).Value = userLogin.Username;
-                command.Parameters.Add("@PASSWORD", System.Data.SqlDbType.NChar, 40).Value = userLogin.Password;
+                command.Parameters.Add("@username", System.Data.SqlDbType.NChar, 40).Value = userLogin.Username;
+                command.Parameters.Add("@password", System.Data.SqlDbType.NChar, 40).Value = userLogin.Password;
 
                 try
                 {
@@ -49,7 +49,7 @@ namespace MinesweeperApp.DatabaseServices
         {
             int id = -1;
 
-            string query = "SELECT * FROM dbo.users WHERE USERNAME = @username";
+            string query = "SELECT * FROM users WHERE USERNAME = @username";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -83,7 +83,7 @@ namespace MinesweeperApp.DatabaseServices
         {
             int id = -1;
 
-            string query = "SELECT * FROM dbo.users WHERE EMAIL = @email";
+            string query = "SELECT * FROM users WHERE EMAIL = @email";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -117,7 +117,7 @@ namespace MinesweeperApp.DatabaseServices
         {
             bool success = false;
 
-            string query = "INSERT INTO dbo.users (USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, SEX, AGE, STATE) VALUES (@username, @password, @firstname, @lastname, @email, @sex, @age, @state)";
+            string query = "INSERT INTO users (USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, SEX, AGE, STATE) VALUES (@username, @password, @firstname, @lastname, @email, @sex, @age, @state)";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {

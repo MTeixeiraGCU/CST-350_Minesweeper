@@ -29,6 +29,7 @@ namespace MinesweeperApp.Controllers
             Won = false;
 
             ViewBag.Width = gbs.Size;
+            ViewBag.TimeStarted = gbs.GetStartTime();
             return View("GameBoard", gbs.Grid);
         }
 
@@ -77,6 +78,24 @@ namespace MinesweeperApp.Controllers
             }
 
             return Json(updatedCells);
+        }
+
+        public IActionResult SaveGame(int userId)
+        {
+            gbs.SaveGame(userId);
+            return View("GameBoard", gbs.Grid);
+        }
+
+        public IActionResult LoadGame(int boardId)
+        {
+            gbs.LoadGame(boardId);
+
+            Lost = false;
+            Won = false;
+
+            ViewBag.Width = gbs.Size;
+            ViewBag.TimeStarted = gbs.GetStartTime();
+            return View("GameBoard", gbs.Grid);
         }
 
         public IActionResult UpdateOneCell(string buttonNumber)
