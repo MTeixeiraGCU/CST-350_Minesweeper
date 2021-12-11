@@ -52,22 +52,26 @@ namespace MinesweeperApp.BusinessServices
         }
 
         //grabs a list of games from the specified user
-        public List<BoardDTO> GetGameList(int userId)
+        public List<Board> GetGameList(int userId = -1)
         {
+            if (userId == -1)
+                return gbDAO.GetAllGameSaves();
             return gbDAO.GetSavesFromUserId(userId);
         }
 
         //grabs a specific game from the sepcified user
-        public BoardDTO GetSaveGame(int userId, int gameId)
+        public Board GetSaveGame(int gameId)
         {
-            return gbDAO.GetSaveFromUserIdAndGameId(userId, gameId);
+            return gbDAO.GetSaveFromGameId(gameId);
         }
 
         //removes the given saved game from the database
-        public void DeleteSaveGame(int gameId)
+        public bool DeleteSaveGame(int gameId)
         {
-            gbDAO.DeleteCells(gameId);
-            gbDAO.DeleteBoard(gameId);
+            bool result = gbDAO.DeleteCells(gameId);
+            if(result)
+                gbDAO.DeleteBoard(gameId);
+            return result;
         }
     }
 }

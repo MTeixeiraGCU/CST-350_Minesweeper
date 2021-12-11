@@ -112,7 +112,12 @@ namespace MinesweeperApp.Controllers
         {
             int userId = 1; ///////////////// THIS NEEDS TO BE REMOVED ONCE THERE IS SESSIONS, THE INTEGER SHOULD BE CHANGED TO A VALID USER ID UNTIL THEN
 
-            var list = sls.GetGameList(userId);
+            List<Board> boardList = sls.GetGameList(userId);
+
+            IEnumerable<BoardDTO> list = from b in boardList
+                                                     select
+                                                     new BoardDTO(b.Id, b.Difficulty, b.TimeStarted, b.TimePlayed)
+                                                     ;
 
             return View(list);
         }

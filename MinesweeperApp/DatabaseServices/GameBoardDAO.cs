@@ -11,9 +11,47 @@ namespace MinesweeperApp.DatabaseServices
     {
         string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
-        public List<BoardDTO> GetSavesFromUserId(int id)
+        public List<Board> GetAllGameSaves()
         {
-            List<BoardDTO> boards = new List<BoardDTO>();
+            List<Board> boards = new List<Board>();
+
+            string query = "SELECT * FROM boards";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Board board = new Board();
+                        board.Id = (int)reader["ID"];
+                        board.Size = (int)reader["SIZE"];
+                        board.Difficulty = (int)reader["DIFFICULTY"];
+                        board.NumberOfMines = (int)reader["NUMBEROFMINES"];
+                        board.TimeStarted = (DateTime)reader["TIMESTARTED"];
+                        board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
+                        boards.Add(board);
+                    }
+
+                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                };
+            }
+
+            return boards;
+        }
+
+        public List<Board> GetSavesFromUserId(int id)
+        {
+            List<Board> boards = new List<Board>();
 
             string query = "SELECT * FROM boards WHERE USER_ID = @id";
 
@@ -30,7 +68,14 @@ namespace MinesweeperApp.DatabaseServices
 
                     while (reader.Read())
                     {
-                        boards.Add(new BoardDTO((int)reader["ID"], (int)reader["DIFFICULTY"], (DateTime)reader["TIMESTARTED"], (TimeSpan)reader["TIMEPLAYED"]));
+                        Board board = new Board();
+                        board.Id = (int)reader["ID"];
+                        board.Size = (int)reader["SIZE"];
+                        board.Difficulty = (int)reader["DIFFICULTY"];
+                        board.NumberOfMines = (int)reader["NUMBEROFMINES"];
+                        board.TimeStarted = (DateTime)reader["TIMESTARTED"];
+                        board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
+                        boards.Add(board);
                     }
 
                     connection.Close();
@@ -44,17 +89,16 @@ namespace MinesweeperApp.DatabaseServices
             return boards;
         }
 
-        public BoardDTO GetSaveFromUserIdAndGameId(int id, int gameId)
+        public Board GetSaveFromGameId(int gameId)
         {
-            BoardDTO board = null;
+            Board board = null;
 
-            string query = "SELECT * FROM boards WHERE USER_ID = @id AND ID = @gameid";
+            string query = "SELECT * FROM boards WHERE ID = @gameid";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.Add("@id", System.Data.SqlDbType.Int).Value = id;
                 command.Parameters.Add("@gameid", System.Data.SqlDbType.Int).Value = gameId;
 
                 try
@@ -65,7 +109,13 @@ namespace MinesweeperApp.DatabaseServices
                     if (reader.HasRows)
                     {
                         reader.Read();
-                        board = new BoardDTO((int)reader["ID"], (int)reader["DIFFICULTY"], (DateTime)reader["TIMESTARTED"], (TimeSpan)reader["TIMEPLAYED"]);
+                        board = new Board();
+                        board.Id = (int)reader["ID"];
+                        board.Size = (int)reader["SIZE"];
+                        board.Difficulty = (int)reader["DIFFICULTY"];
+                        board.NumberOfMines = (int)reader["NUMBEROFMINES"];
+                        board.TimeStarted = (DateTime)reader["TIMESTARTED"];
+                        board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
                     }
 
                     connection.Close();
