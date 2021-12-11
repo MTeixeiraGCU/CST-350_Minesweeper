@@ -13,6 +13,7 @@ namespace MinesweeperApp.Models
         public int NumberOfMines { get; set; }
         public Cell[,] Grid;
         public DateTime TimeStarted { get; set; }
+        public DateTime CurrentStartTime { get; set; }
         public TimeSpan TimePlayed { get; set; }
 
         public Board()

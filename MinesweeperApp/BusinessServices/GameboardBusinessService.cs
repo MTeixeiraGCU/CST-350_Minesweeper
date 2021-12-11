@@ -11,81 +11,48 @@ namespace MinesweeperApp.BusinessServices
     {
         public int Size {
             get {
-                return gameBoard.Size;
+                return GameBoard.Size;
             }
         }
+        public Board GameBoard { get; set; }
 
         public delegate void RevealCell(int id);
 
         private const int GRID_SIZE = 10;
         private float[] DifficultySettings = { 0.12f, 0.14f, 0.16f };
 
-        private static GameBoardDAO gbDAO = new GameBoardDAO();
-
         public List<Cell> Grid
         {
             get
             {
                 List<Cell> cells = new List<Cell>();
-                for (int i = 0; i < gameBoard.Size; i++)
+                for (int i = 0; i < GameBoard.Size; i++)
                 {
-                    for (int j = 0; j < gameBoard.Size; j++)
+                    for (int j = 0; j < GameBoard.Size; j++)
                     {
-                        cells.Add(gameBoard.Grid[i, j]);
+                        cells.Add(GameBoard.Grid[i, j]);
                     }
                 }
                 return cells;
             }
         }
 
-        private Board gameBoard;
 
         public GameboardBusinessService()
         {
-            gameBoard = new Board();
-        }
-
-        //this method will save or update the current game with the given userId
-        public void SaveGame(int userId)
-        {
-            gameBoard.TimePlayed = DateTime.Now - gameBoard.TimeStarted;
-            if(gameBoard.Id >= 0)
-            {
-                //update previous game here
-            }
-            else
-            {
-                //new game save
-                gameBoard.Id = gbDAO.SaveBoard(gameBoard, userId);
-            }
-            
-            if(gameBoard.Id >= 0) //we have a good save in the database
-            {
-                for (int i = 0; i < gameBoard.Size * gameBoard.Size; i++)
-                {
-                    gbDAO.SaveCells(gameBoard.Grid[i / gameBoard.Size, i % gameBoard.Size], gameBoard.Id);
-                }
-            }
-        }
-
-        //This method attempts to load a game from the given id
-        public void LoadGame(int boardId)
-        {
-            gameBoard = gbDAO.LoadBoard(boardId); //may return null
-            if (gameBoard != null)
-                gameBoard.Grid = gbDAO.LoadCells(gameBoard);
+            GameBoard = new Board();
         }
 
         //This method initiates a new game and randomizes the mines on the grid based off of the difficulty
         public void NewGame(string difficulty)
         {
             //create a new board
-            gameBoard.Difficulty = getDifficultyFromString(difficulty);
-            gameBoard.Size = GRID_SIZE;
-            gameBoard.TimeStarted = DateTime.Now;
+            GameBoard.Difficulty = getDifficultyFromString(difficulty);
+            GameBoard.Size = GRID_SIZE;
+            GameBoard.TimeStarted = GameBoard.CurrentStartTime = DateTime.Now;
             
             //clears the existing grid to a certain size
-            clearGrid(gameBoard.Size);
+            clearGrid(GameBoard.Size);
 
             //create the mines on the board
             setupLiveNeighbors();
@@ -98,14 +65,14 @@ namespace MinesweeperApp.BusinessServices
         public void ToggleFlag(int id)
         {
             //grab the current cell's position
-            var row = id / gameBoard.Size;
-            var col = id % gameBoard.Size;
+            var row = id / GameBoard.Size;
+            var col = id % GameBoard.Size;
 
             //check bounds first
             if (withinBounds(row, col))
             {
                 //toggle flag
-                gameBoard.Grid[row, col].Flagged = !gameBoard.Grid[row, col].Flagged;
+                GameBoard.Grid[row, col].Flagged = !GameBoard.Grid[row, col].Flagged;
             }
         }
 
@@ -114,7 +81,7 @@ namespace MinesweeperApp.BusinessServices
         {
             int counter = 0;
 
-            foreach (var cell in gameBoard.Grid)
+            foreach (var cell in GameBoard.Grid)
             {
                 if (cell.Visited || (cell.Flagged && cell.Mine))
                 {
@@ -122,7 +89,7 @@ namespace MinesweeperApp.BusinessServices
                 }
             }
 
-            if (counter == (gameBoard.Size * gameBoard.Size))
+            if (counter == (GameBoard.Size * GameBoard.Size))
                 return true;
             else
                 return false;
@@ -132,8 +99,8 @@ namespace MinesweeperApp.BusinessServices
         public bool MakeMove(int id, RevealCell revealCell = null)
         {
             //grab the current cell's position
-            var row = id / gameBoard.Size;
-            var col = id % gameBoard.Size;
+            var row = id / GameBoard.Size;
+            var col = id % GameBoard.Size;
 
             if (!withinBounds(row, col))
             {
@@ -141,29 +108,29 @@ namespace MinesweeperApp.BusinessServices
             }
 
             //check for flag or a previous visit
-            if (gameBoard.Grid[row, col].Flagged || gameBoard.Grid[row, col].Visited)
+            if (GameBoard.Grid[row, col].Flagged || GameBoard.Grid[row, col].Visited)
             {
                 return false;
             }
 
             //visit the cell
-            gameBoard.Grid[row, col].Visited = true;
+            GameBoard.Grid[row, col].Visited = true;
             if(revealCell != null)
-                revealCell((row * gameBoard.Size) + col);
+                revealCell((row * GameBoard.Size) + col);
 
             //check for no neighbors
-            if (gameBoard.Grid[row, col].LiveNeighbors == 0)
+            if (GameBoard.Grid[row, col].LiveNeighbors == 0)
             {
                 //recursively fill out all 0 neighbors cells
                 floodFill(row, col, revealCell);
             }
 
-            return gameBoard.Grid[row, col].Mine;
+            return GameBoard.Grid[row, col].Mine;
         }
 
         public void RevealAll(RevealCell revealCell)
         {
-            foreach (var cell in gameBoard.Grid)
+            foreach (var cell in GameBoard.Grid)
             {
                 if (!cell.Visited)
                 {
@@ -175,19 +142,19 @@ namespace MinesweeperApp.BusinessServices
 
         public DateTime GetStartTime()
         {
-            return gameBoard.TimeStarted;
+            return GameBoard.TimeStarted;
         }
 
         //This method clears the given board grid and sizes the new one based on the inputted size
         private void clearGrid(int size)
         {
-            gameBoard.Grid = new Cell[size, size];
+            GameBoard.Grid = new Cell[size, size];
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
                     //Id for each cell will be (row * width + col)
-                    gameBoard.Grid[i, j] = new Cell((i * size) + j);
+                    GameBoard.Grid[i, j] = new Cell((i * size) + j);
                 }
             }
         }
@@ -199,23 +166,23 @@ namespace MinesweeperApp.BusinessServices
             var rand = new Random();
 
             //first determine the number of mines based on difficulty
-            gameBoard.NumberOfMines = (int)((gameBoard.Size * gameBoard.Size) * DifficultySettings[gameBoard.Difficulty - 1]);
+            GameBoard.NumberOfMines = (int)((GameBoard.Size * GameBoard.Size) * DifficultySettings[GameBoard.Difficulty - 1]);
 
-            for (int i = 0; i < gameBoard.NumberOfMines; i++)
+            for (int i = 0; i < GameBoard.NumberOfMines; i++)
             {
                 //randomly place mine
-                var row = rand.Next(0, gameBoard.Size);
-                var col = rand.Next(0, gameBoard.Size);
+                var row = rand.Next(0, GameBoard.Size);
+                var col = rand.Next(0, GameBoard.Size);
 
                 //check for previously placed mine
-                if (gameBoard.Grid[row, col].Mine)
+                if (GameBoard.Grid[row, col].Mine)
                 {
                     //go back and try to place it again
                     i--;
                 }
                 else
                 {
-                    gameBoard.Grid[row, col].Mine = true;
+                    GameBoard.Grid[row, col].Mine = true;
                 }
             }
         }
@@ -224,7 +191,7 @@ namespace MinesweeperApp.BusinessServices
         private void calculateLiveNeighbors()
         {
             //loop through each Cell to populate its neighbors
-            foreach (var cell in gameBoard.Grid)
+            foreach (var cell in GameBoard.Grid)
             {
                 //loop through each cell surrounding the current cell in a 3x3 Grid
                 for (int m = -1; m < 2; m++)
@@ -232,8 +199,8 @@ namespace MinesweeperApp.BusinessServices
                     for (int n = -1; n < 2; n++)
                     {
                         //grab the current neighbor's position
-                        var row = (cell.Id / gameBoard.Size) + m;
-                        var col = (cell.Id % gameBoard.Size) + n;
+                        var row = (cell.Id / GameBoard.Size) + m;
+                        var col = (cell.Id % GameBoard.Size) + n;
 
                         //check if we are off the board
                         if (!withinBounds(row, col))
@@ -242,7 +209,7 @@ namespace MinesweeperApp.BusinessServices
                         }
 
                         //check for mine
-                        if (gameBoard.Grid[row, col].Mine)
+                        if (GameBoard.Grid[row, col].Mine)
                         {
                             cell.LiveNeighbors++;
                         }
@@ -253,7 +220,7 @@ namespace MinesweeperApp.BusinessServices
         //this method checks that we are inside the bounds
         private bool withinBounds(int row, int col)
         {
-            return row >= 0 && col >= 0 && row < gameBoard.Size && col < gameBoard.Size;
+            return row >= 0 && col >= 0 && row < GameBoard.Size && col < GameBoard.Size;
         }
 
         //Recursive function to find all empty neighbors and set them to visited
@@ -270,17 +237,17 @@ namespace MinesweeperApp.BusinessServices
                     }
 
                     //check if we have been to this cell already or if it is flagged
-                    if (gameBoard.Grid[row + i, col + j].Visited || gameBoard.Grid[row + i, col + j].Flagged)
+                    if (GameBoard.Grid[row + i, col + j].Visited || GameBoard.Grid[row + i, col + j].Flagged)
                     {
                         continue;
                     }
 
                     //visit the cell and check for continued recursion
-                    gameBoard.Grid[row + i, col + j].Visited = true;
+                    GameBoard.Grid[row + i, col + j].Visited = true;
                     if(revealCell != null)
-                        revealCell(((row + i) * gameBoard.Size) + col + j);
+                        revealCell(((row + i) * GameBoard.Size) + col + j);
 
-                    if (gameBoard.Grid[row + i, col + j].LiveNeighbors == 0)
+                    if (GameBoard.Grid[row + i, col + j].LiveNeighbors == 0)
                     {
                         floodFill(row + i, col + j, revealCell);
                     }

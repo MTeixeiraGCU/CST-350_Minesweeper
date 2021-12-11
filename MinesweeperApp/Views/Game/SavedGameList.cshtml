@@ -1,0 +1,43 @@
+﻿@model IEnumerable<MinesweeperApp.Models.BoardDTO>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Difficulty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStarted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimePlayed)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Difficulty)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStarted)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimePlayed)
+            </td>
+            <td>
+                @Html.ActionLink("Load", "LoadGame", new { boardId=item.Id }) |
+                @Html.ActionLink("Delete", "DeleteGame", new { boardId = item.Id })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

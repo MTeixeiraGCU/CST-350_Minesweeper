@@ -11,6 +11,7 @@ namespace MinesweeperApp.Controllers
     public class GameController : Controller
     {
         static GameboardBusinessService gbs = new GameboardBusinessService();
+        static SavingLoadingService sls = new SavingLoadingService();
         static bool Lost;
         static bool Won;
 
@@ -80,15 +81,17 @@ namespace MinesweeperApp.Controllers
             return Json(updatedCells);
         }
 
-        public IActionResult SaveGame(int userId)
+        public IActionResult SaveGame()
         {
-            gbs.SaveGame(userId);
-            return View("GameBoard", gbs.Grid);
+            int userId = 1; ///////////////// THIS NEEDS TO BE REMOVED ONCE THERE IS SESSIONS, THE INTEGER SHOULD BE CHANGED TO A VALID USER ID UNTIL THEN
+
+            sls.SaveGame(userId, gbs.GameBoard);
+            return LoadGame(gbs.GameBoard.Id);
         }
 
         public IActionResult LoadGame(int boardId)
         {
-            gbs.LoadGame(boardId);
+            gbs.GameBoard = sls.LoadGame(boardId, gbs.GameBoard);
 
             Lost = false;
             Won = false;
@@ -96,6 +99,22 @@ namespace MinesweeperApp.Controllers
             ViewBag.Width = gbs.Size;
             ViewBag.TimeStarted = gbs.GetStartTime();
             return View("GameBoard", gbs.Grid);
+        }
+
+        public IActionResult DeleteGame(int boardId)
+        {
+            sls.DeleteSaveGame(boardId);
+
+            return SavedGameList();
+        }
+
+        public IActionResult SavedGameList()
+        {
+            int userId = 1; ///////////////// THIS NEEDS TO BE REMOVED ONCE THERE IS SESSIONS, THE INTEGER SHOULD BE CHANGED TO A VALID USER ID UNTIL THEN
+
+            var list = sls.GetGameList(userId);
+
+            return View(list);
         }
 
         public IActionResult UpdateOneCell(string buttonNumber)

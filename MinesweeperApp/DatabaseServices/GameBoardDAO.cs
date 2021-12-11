@@ -12,7 +12,7 @@ namespace MinesweeperApp.DatabaseServices
         string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         public List<BoardDTO> GetSavesFromUserId(int id)
-        { 
+        {
             List<BoardDTO> boards = new List<BoardDTO>();
 
             string query = "SELECT * FROM boards WHERE USER_ID = @id";
@@ -28,7 +28,7 @@ namespace MinesweeperApp.DatabaseServices
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
 
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         boards.Add(new BoardDTO((int)reader["ID"], (int)reader["DIFFICULTY"], (DateTime)reader["TIMESTARTED"], (TimeSpan)reader["TIMEPLAYED"]));
                     }
@@ -42,6 +42,41 @@ namespace MinesweeperApp.DatabaseServices
             }
 
             return boards;
+        }
+
+        public BoardDTO GetSaveFromUserIdAndGameId(int id, int gameId)
+        {
+            BoardDTO board = null;
+
+            string query = "SELECT * FROM boards WHERE USER_ID = @id AND ID = @gameid";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+
+                command.Parameters.Add("@id", System.Data.SqlDbType.Int).Value = id;
+                command.Parameters.Add("@gameid", System.Data.SqlDbType.Int).Value = gameId;
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        board = new BoardDTO((int)reader["ID"], (int)reader["DIFFICULTY"], (DateTime)reader["TIMESTARTED"], (TimeSpan)reader["TIMEPLAYED"]);
+                    }
+
+                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                };
+            }
+
+            return board;
         }
 
         public int SaveBoard(Board board, int userId)
@@ -67,7 +102,7 @@ namespace MinesweeperApp.DatabaseServices
 
                     var affectedRow = command.ExecuteScalar();
 
-                    if(affectedRow != null)
+                    if (affectedRow != null)
                     {
                         results = (int)affectedRow;
                     }
@@ -121,6 +156,37 @@ namespace MinesweeperApp.DatabaseServices
             return success;
         }
 
+        public bool UpdateSavedBoard(int boardId, TimeSpan timePlayed)
+        {
+            bool results = false;
+
+            string sqlStatement = "UPDATE boards SET TIMEPLAYED = @timeplayed WHERE ID = @boardid";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(sqlStatement, connection);
+
+                command.Parameters.AddWithValue("@boardid", boardId);
+                command.Parameters.AddWithValue("@timeplayed", timePlayed);
+
+                try
+                {
+                    connection.Open();
+
+                    int affectedRows = command.ExecuteNonQuery();
+                    if (affectedRows > 0)
+                        results = true;
+
+                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return results;
+        }
+
         public Board LoadBoard(int boardId)
         {
             Board board = null;
@@ -138,7 +204,7 @@ namespace MinesweeperApp.DatabaseServices
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
 
-                    if(reader.HasRows)
+                    if (reader.HasRows)
                     {
                         reader.Read();
                         board = new Board();
@@ -146,7 +212,7 @@ namespace MinesweeperApp.DatabaseServices
                         board.Size = (int)reader["SIZE"];
                         board.Difficulty = (int)reader["DIFFICULTY"];
                         board.NumberOfMines = (int)reader["NUMBEROFMINES"];
-                        board.TimeStarted = (DateTime)reader["TIMESTATED"];
+                        board.TimeStarted = (DateTime)reader["TIMESTARTED"];
                         board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
                     }
 
@@ -193,5 +259,63 @@ namespace MinesweeperApp.DatabaseServices
 
             return cells;
         }
+
+        public bool DeleteBoard(int boardId)
+        {
+            bool isDeleted = false;
+
+            string sqlStatement = "DELETE FROM boards WHERE ID = @boardid";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(sqlStatement, connection);
+
+                command.Parameters.AddWithValue("@boardId", boardId);
+
+                try
+                {
+                    connection.Open();
+
+                    command.ExecuteNonQuery();
+                    isDeleted = true;
+
+                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return isDeleted;
+        }
+        public bool DeleteCells(int boardId)
+        {
+            bool isDeleted = false;
+
+            string sqlStatement = "DELETE FROM cells WHERE BOARD_ID = @boardid";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(sqlStatement, connection);
+
+                command.Parameters.AddWithValue("@boardId", boardId);
+
+                try
+                {
+                    connection.Open();
+
+                    command.ExecuteNonQuery();
+                    isDeleted = true;
+
+                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return isDeleted;
+        }
     }
 }
+
