@@ -7,11 +7,21 @@ using System.Threading.Tasks;
 
 namespace MinesweeperApp.DatabaseServices
 {
+    /// <summary>
+    /// This class handles database entries and processing for user objects
+    /// </summary>
     public class UserDAO
     {
+        //Connection string to local VS created MySQL database
         string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
-        public bool FindUserByUsernameAndPassword(User userLogin)
+        /// <summary>
+        /// This method retrieves a user's complete information from the given user name and password.
+        /// </summary>
+        /// <param name="userName">Unique user name to search for in the database</param>
+        /// <param name="password">Associated password to validate user with.</param>
+        /// <returns>Boolean value of successful location of user credintials. true if they were found, false otherwise.</returns>
+        public bool FindUserByUsernameAndPassword(string userName, string password)
         {
             bool success = false;
             
@@ -21,8 +31,8 @@ namespace MinesweeperApp.DatabaseServices
             {
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.Add("@username", System.Data.SqlDbType.NChar, 40).Value = userLogin.Username;
-                command.Parameters.Add("@password", System.Data.SqlDbType.NChar, 40).Value = userLogin.Password;
+                command.Parameters.Add("@username", System.Data.SqlDbType.NChar, 40).Value = userName;
+                command.Parameters.Add("@password", System.Data.SqlDbType.NChar, 40).Value = password;
 
                 try
                 {
@@ -45,6 +55,11 @@ namespace MinesweeperApp.DatabaseServices
             return success;
         }
 
+        /// <summary>
+        /// This metthod finds the user's unique Id from thier chosen userName.
+        /// </summary>
+        /// <param name="username">The name that the user chose during registration.</param>
+        /// <returns>The found Id that matches the user's unique userName. returns -1 if no entries were found.</returns>
         public int GetIdFromUsername(string username)
         {
             int id = -1;
@@ -79,6 +94,11 @@ namespace MinesweeperApp.DatabaseServices
             return id;
         }
 
+        /// <summary>
+        /// This metthod finds the user's unique Id from thier given email.
+        /// </summary>
+        /// <param name="email">The email that the user chose during registration.</param>
+        /// <returns>The found Id that matches the user's unique email. returns -1 if no entries were found.</returns>
         public int GetIdFromEmail(string email)
         {
             int id = -1;
@@ -113,6 +133,11 @@ namespace MinesweeperApp.DatabaseServices
             return id;
         }
 
+        /// <summary>
+        /// This method adds a user to the database.
+        /// </summary>
+        /// <param name="user">The user object with the information to add.</param>
+        /// <returns>Boolean value that represents whether the user was successfully added. true if they were added, false otherwise.</returns>
         public bool Add(User user)
         {
             bool success = false;

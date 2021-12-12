@@ -7,10 +7,18 @@ using System.Linq;
 
 namespace MinesweeperApp.DatabaseServices
 {
+    /// <summary>
+    /// This class handles processing database exchanges for game board data.
+    /// </summary>
     public class GameBoardDAO
     {
+        //Connection string to local VS created MySQL database
         string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
+        /// <summary>
+        /// This method returns all of the found save games in the entire database.
+        /// </summary>
+        /// <returns>A complete list of save games from the database.</returns>
         public List<Board> GetAllGameSaves()
         {
             List<Board> boards = new List<Board>();
@@ -33,6 +41,7 @@ namespace MinesweeperApp.DatabaseServices
                         board.Size = (int)reader["SIZE"];
                         board.Difficulty = (int)reader["DIFFICULTY"];
                         board.NumberOfMines = (int)reader["NUMBEROFMINES"];
+                        board.Grid = Board.DeserializeGridFromString((string)reader["GRID"]);
                         board.TimeStarted = (DateTime)reader["TIMESTARTED"];
                         board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
                         boards.Add(board);
@@ -49,6 +58,11 @@ namespace MinesweeperApp.DatabaseServices
             return boards;
         }
 
+        /// <summary>
+        /// This method retrieves all of the save games owned by the given user Id
+        /// </summary>
+        /// <param name="id">The user Id to cross check save games for.</param>
+        /// <returns>A list of all the save games from a particular user.</returns>
         public List<Board> GetSavesFromUserId(int id)
         {
             List<Board> boards = new List<Board>();
@@ -90,46 +104,12 @@ namespace MinesweeperApp.DatabaseServices
             return boards;
         }
 
-        /*public Board GetSaveFromGameId(int gameId)
-        {
-            Board board = null;
-
-            string query = "SELECT * FROM boards WHERE ID = @gameid";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Parameters.Add("@gameid", System.Data.SqlDbType.Int).Value = gameId;
-
-                try
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-
-                    if (reader.HasRows)
-                    {
-                        reader.Read();
-                        board = new Board();
-                        board.Id = (int)reader["ID"];
-                        board.Size = (int)reader["SIZE"];
-                        board.Difficulty = (int)reader["DIFFICULTY"];
-                        board.NumberOfMines = (int)reader["NUMBEROFMINES"];
-                        board.TimeStarted = (DateTime)reader["TIMESTARTED"];
-                        board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
-                    }
-
-                    connection.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                };
-            }
-
-            return board;
-        }*/
-
+        /// <summary>
+        /// This method saves a new board into the database.
+        /// </summary>
+        /// <param name="board">The board object to enter into the database.</param>
+        /// <param name="userId">The user Id to store the given board under.</param>
+        /// <returns>Result integer of the newly saved boards unique Id.</returns>
         public int SaveBoard(Board board, int userId)
         {
             int results = -1; //Holds the new ID for this particular board or -1 if insert failed
@@ -170,44 +150,11 @@ namespace MinesweeperApp.DatabaseServices
             return results;
         }
 
-        /*public bool SaveCells(Cell cell, int boardId)
-        {
-            bool success = false;
-
-            string query = "INSERT INTO cells (CELL_ID, VISITED, MINE, FLAGGED, LIVENEIGHBORS, BOARD_ID) VALUES (@id, @visited, @mine, @flagged, @liveneighbors, @boardid)";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Parameters.Add("@id", System.Data.SqlDbType.Int).Value = cell.Id;
-                command.Parameters.Add("@visited", System.Data.SqlDbType.Bit).Value = cell.Visited;
-                command.Parameters.Add("@mine", System.Data.SqlDbType.Bit).Value = cell.Mine;
-                command.Parameters.Add("@flagged", System.Data.SqlDbType.Bit).Value = cell.Flagged;
-                command.Parameters.Add("@liveneighbors", System.Data.SqlDbType.Int).Value = cell.LiveNeighbors;
-                command.Parameters.Add("@boardid", System.Data.SqlDbType.Int).Value = boardId;
-
-                try
-                {
-                    connection.Open();
-                    int affectedRows = command.ExecuteNonQuery();
-
-                    if (affectedRows > 0)
-                    {
-                        success = true;
-                    }
-
-                    connection.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error during cell save. Cell: " + cell.Id + ". " + ex.Message);
-                }
-            }
-
-            return success;
-        }*/
-
+        /// <summary>
+        /// This method updates a board that already exists in the database. Does not check for existence. Currently only updates playtime and grid status.
+        /// </summary>
+        /// <param name="board">The board information to update the database with.</param>
+        /// <returns>Boolean value representing a successful update. true being success and false otherwise.</returns>
         public bool UpdateSavedBoard(Board board)
         {
             bool results = false;
@@ -240,6 +187,11 @@ namespace MinesweeperApp.DatabaseServices
             return results;
         }
 
+        /// <summary>
+        /// This method loads the given board Id and returns it as a newly created Board object
+        /// </summary>
+        /// <param name="boardId">The Id of the board to load from the database.</param>
+        /// <returns>A newly created board object from the recieved data in the database.</returns>
         public Board LoadBoard(int boardId)
         {
             Board board = null;
@@ -280,40 +232,11 @@ namespace MinesweeperApp.DatabaseServices
             return board;
         }
 
-        /*public Cell[,] LoadCells(Board board)
-        {
-            Cell[,] cells = new Cell[board.Size, board.Size];
-
-            string query = "SELECT * FROM cells WHERE BOARD_ID = @boardId";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlCommand command = new SqlCommand(query, connection);
-
-                command.Parameters.Add("@boardId", System.Data.SqlDbType.Int).Value = board.Id;
-
-                try
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        Cell cell = new Cell((int)reader["CELL_ID"], (bool)reader["VISITED"], (bool)reader["MINE"], (bool)reader["FLAGGED"], (int)reader["LIVENEIGHBORS"]);
-                        cells[cell.Id / board.Size, cell.Id % board.Size] = cell;
-                    }
-
-                    connection.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                };
-            }
-
-            return cells;
-        }*/
-
+        /// <summary>
+        /// This method removes a single board from the database.
+        /// </summary>
+        /// <param name="boardId">The Id of the board to remove from the database.</param>
+        /// <returns>Boolean value representing a successful deletion. true if the board was removed, false otherwise.</returns>
         public bool DeleteBoard(int boardId)
         {
             bool isDeleted = false;
@@ -342,35 +265,6 @@ namespace MinesweeperApp.DatabaseServices
             }
             return isDeleted;
         }
-
-       /* public bool DeleteCells(int boardId)
-        {
-            bool isDeleted = false;
-
-            string sqlStatement = "DELETE FROM cells WHERE BOARD_ID = @boardid";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlCommand command = new SqlCommand(sqlStatement, connection);
-
-                command.Parameters.AddWithValue("@boardId", boardId);
-
-                try
-                {
-                    connection.Open();
-
-                    command.ExecuteNonQuery();
-                    isDeleted = true;
-
-                    connection.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            return isDeleted;
-        }*/
     }
 }
 
