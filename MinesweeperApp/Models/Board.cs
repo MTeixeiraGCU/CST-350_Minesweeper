@@ -11,7 +11,7 @@ namespace MinesweeperApp.Models
         public int Size { get; set; }
         public int Difficulty { get; set; }
         public int NumberOfMines { get; set; }
-        public Cell[,] Grid;
+        public Cell[,] Grid { get; set; }
         public DateTime TimeStarted { get; set; }
         public DateTime CurrentStartTime { get; set; }
         public TimeSpan TimePlayed { get; set; }
