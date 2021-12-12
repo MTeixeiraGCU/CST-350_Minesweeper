@@ -7,34 +7,46 @@ using System.Threading.Tasks;
 
 namespace MinesweeperApp.Models
 {
+    /// <summary>
+    /// This class model holds the information for a single user account
+    /// </summary>
     public class User
     {
+        //The uniques Id for this user
         public int Id { get; set; }
 
+        //The user's First Name
         [Required]
         [StringLength(30, MinimumLength = 3)]
         public string FirstName { get; set; }
 
+        //The user's Last Name
         [Required]
         [StringLength(30, MinimumLength = 3)]
         public string LastName { get; set; }
 
+        //The user's associated gender preference
         [Required]
         public string Sex { get; set; }
 
+        //How old the user is
         [Required]
         [Range(5, 120)]
         public int Age { get; set; }
 
+        //Which state the user resides in
         public string State { get; set; }
 
+        //Uniques email for contacting this user
         [Required]
         [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email address format!")]
         public string Email { get; set; }
 
+        //Unique user name to be used as the user's login identification
         [Required]
         public string Username { get; set; }
 
+        //Password associated with this user's account
         [Required]
         public string Password { get; set; }
 
@@ -56,6 +68,9 @@ namespace MinesweeperApp.Models
         }
     }
 
+    /// <summary>
+    /// This enum represents a gender selection
+    /// </summary>
     public enum Gender
     {
         Other = 0,
@@ -63,6 +78,9 @@ namespace MinesweeperApp.Models
         Male = 2
     }
 
+    /// <summary>
+    /// This enum holds all the possible states for selection
+    /// </summary>
     public enum States
     {
         None,
