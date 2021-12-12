@@ -125,7 +125,6 @@ namespace MinesweeperApp.Controllers
         public IActionResult UpdateOneCell(string buttonNumber)
         {
             int id = int.Parse(buttonNumber);
-
             return PartialView("SingleButton", gbs.Grid.ElementAt(id));
         }
         public IActionResult Winner()

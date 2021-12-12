@@ -18,23 +18,12 @@ namespace MinesweeperApp.BusinessServices
             if (board.Id >= 0)
             {
                 //update previous time
-                gbDAO.UpdateSavedBoard(board.Id, board.TimePlayed);
-
-                //remove old cells so that new ones can be added
-                gbDAO.DeleteCells(board.Id);
+                gbDAO.UpdateSavedBoard(board);
             }
             else
             {
                 //new game save
                 board.Id = gbDAO.SaveBoard(board, userId);
-            }
-
-            if (board.Id >= 0) //we have a good save in the database
-            {
-                for (int i = 0; i < board.Size * board.Size; i++)
-                {
-                    gbDAO.SaveCells(board.Grid[i / board.Size, i % board.Size], board.Id);
-                }
             }
         }
 
@@ -42,8 +31,6 @@ namespace MinesweeperApp.BusinessServices
         public Board LoadGame(int boardId, Board board)
         {
             board = gbDAO.LoadBoard(boardId); //may return null
-            if (board != null)
-                board.Grid = gbDAO.LoadCells(board);
 
             //timer for the current session
             board.CurrentStartTime = DateTime.Now;
@@ -60,18 +47,15 @@ namespace MinesweeperApp.BusinessServices
         }
 
         //grabs a specific game from the sepcified user
-        public Board GetSaveGame(int gameId)
+        public Board GetSaveGame(int boardId)
         {
-            return gbDAO.GetSaveFromGameId(gameId);
+            return gbDAO.LoadBoard(boardId);
         }
 
         //removes the given saved game from the database
-        public bool DeleteSaveGame(int gameId)
+        public bool DeleteSaveGame(int boardId)
         {
-            bool result = gbDAO.DeleteCells(gameId);
-            if(result)
-                gbDAO.DeleteBoard(gameId);
-            return result;
+            return gbDAO.DeleteBoard(boardId);
         }
     }
 }

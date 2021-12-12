@@ -73,6 +73,7 @@ namespace MinesweeperApp.DatabaseServices
                         board.Size = (int)reader["SIZE"];
                         board.Difficulty = (int)reader["DIFFICULTY"];
                         board.NumberOfMines = (int)reader["NUMBEROFMINES"];
+                        board.Grid = Board.DeserializeGridFromString((string)reader["GRID"]);
                         board.TimeStarted = (DateTime)reader["TIMESTARTED"];
                         board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
                         boards.Add(board);
@@ -89,7 +90,7 @@ namespace MinesweeperApp.DatabaseServices
             return boards;
         }
 
-        public Board GetSaveFromGameId(int gameId)
+        /*public Board GetSaveFromGameId(int gameId)
         {
             Board board = null;
 
@@ -127,13 +128,13 @@ namespace MinesweeperApp.DatabaseServices
             }
 
             return board;
-        }
+        }*/
 
         public int SaveBoard(Board board, int userId)
         {
             int results = -1; //Holds the new ID for this particular board or -1 if insert failed
 
-            string query = "INSERT INTO boards (USER_ID, SIZE, DIFFICULTY, NUMBEROFMINES, TIMESTARTED, TIMEPLAYED) OUTPUT INSERTED.ID VALUES (@user, @size, @difficulty, @numberofmines, @timestarted, @timeplayed);";
+            string query = "INSERT INTO boards (USER_ID, SIZE, DIFFICULTY, NUMBEROFMINES, GRID, TIMESTARTED, TIMEPLAYED) OUTPUT INSERTED.ID VALUES (@user, @size, @difficulty, @numberofmines, @grid, @timestarted, @timeplayed);";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -143,6 +144,7 @@ namespace MinesweeperApp.DatabaseServices
                 command.Parameters.Add("@size", System.Data.SqlDbType.Int).Value = board.Size;
                 command.Parameters.Add("@difficulty", System.Data.SqlDbType.Int).Value = board.Difficulty;
                 command.Parameters.Add("@numberofmines", System.Data.SqlDbType.Int).Value = board.NumberOfMines;
+                command.Parameters.Add("@grid", System.Data.SqlDbType.NVarChar).Value = Board.SerializeGridToString(board.Grid, board.Size, board.Size);
                 command.Parameters.Add("@timestarted", System.Data.SqlDbType.DateTime).Value = board.TimeStarted;
                 command.Parameters.Add("@timeplayed", System.Data.SqlDbType.Time).Value = board.TimePlayed;
 
@@ -168,7 +170,7 @@ namespace MinesweeperApp.DatabaseServices
             return results;
         }
 
-        public bool SaveCells(Cell cell, int boardId)
+        /*public bool SaveCells(Cell cell, int boardId)
         {
             bool success = false;
 
@@ -204,20 +206,21 @@ namespace MinesweeperApp.DatabaseServices
             }
 
             return success;
-        }
+        }*/
 
-        public bool UpdateSavedBoard(int boardId, TimeSpan timePlayed)
+        public bool UpdateSavedBoard(Board board)
         {
             bool results = false;
 
-            string sqlStatement = "UPDATE boards SET TIMEPLAYED = @timeplayed WHERE ID = @boardid";
+            string sqlStatement = "UPDATE boards SET GRID = @grid, TIMEPLAYED = @timeplayed WHERE ID = @boardid";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 SqlCommand command = new SqlCommand(sqlStatement, connection);
 
-                command.Parameters.AddWithValue("@boardid", boardId);
-                command.Parameters.AddWithValue("@timeplayed", timePlayed);
+                command.Parameters.AddWithValue("@boardid", board.Id);
+                command.Parameters.Add("@grid", System.Data.SqlDbType.NVarChar).Value = Board.SerializeGridToString(board.Grid, board.Size, board.Size);
+                command.Parameters.AddWithValue("@timeplayed", board.TimePlayed);
 
                 try
                 {
@@ -262,6 +265,7 @@ namespace MinesweeperApp.DatabaseServices
                         board.Size = (int)reader["SIZE"];
                         board.Difficulty = (int)reader["DIFFICULTY"];
                         board.NumberOfMines = (int)reader["NUMBEROFMINES"];
+                        board.Grid = Board.DeserializeGridFromString((string)reader["GRID"]);
                         board.TimeStarted = (DateTime)reader["TIMESTARTED"];
                         board.TimePlayed = (TimeSpan)reader["TIMEPLAYED"];
                     }
@@ -276,7 +280,7 @@ namespace MinesweeperApp.DatabaseServices
             return board;
         }
 
-        public Cell[,] LoadCells(Board board)
+        /*public Cell[,] LoadCells(Board board)
         {
             Cell[,] cells = new Cell[board.Size, board.Size];
 
@@ -308,7 +312,7 @@ namespace MinesweeperApp.DatabaseServices
             }
 
             return cells;
-        }
+        }*/
 
         public bool DeleteBoard(int boardId)
         {
@@ -338,7 +342,8 @@ namespace MinesweeperApp.DatabaseServices
             }
             return isDeleted;
         }
-        public bool DeleteCells(int boardId)
+
+       /* public bool DeleteCells(int boardId)
         {
             bool isDeleted = false;
 
@@ -365,7 +370,7 @@ namespace MinesweeperApp.DatabaseServices
                 }
             }
             return isDeleted;
-        }
+        }*/
     }
 }
 
