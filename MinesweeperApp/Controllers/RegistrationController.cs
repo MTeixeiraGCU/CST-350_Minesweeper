@@ -33,12 +33,12 @@ namespace MinesweeperApp.Controllers
             RegistrationBusinessService rbs = new RegistrationBusinessService();
 
             //Check for duplicate username
-            if(!rbs.CheckUsernameAvailability(user))
+            if(!rbs.CheckUsernameAvailability(user.Username))
             {
                 ModelState.AddModelError("Username", "That username has already been taken!");
             }
             //Check for duplicate email
-            if(!rbs.CheckEmailAvailability(user))
+            if(!rbs.CheckEmailAvailability(user.Email))
             {
                 ModelState.AddModelError("Email", "That email has been used for another account already!");
             }

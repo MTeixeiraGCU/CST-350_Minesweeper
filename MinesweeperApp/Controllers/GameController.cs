@@ -164,7 +164,7 @@ namespace MinesweeperApp.Controllers
         public IActionResult LoadGame(int boardId)
         {
             //Grab the game board fro the loading business service
-            gbs.GameBoard = sls.LoadGame(boardId, gbs.GameBoard);
+            gbs.GameBoard = sls.LoadGame(boardId);
 
             //set the state to for continued playing
             State = GameState.Playing;
