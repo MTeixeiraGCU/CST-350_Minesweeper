@@ -66,6 +66,7 @@ namespace MinesweeperApp.BusinessServices
             GameBoard.Difficulty = getDifficultyFromString(difficulty);
             GameBoard.Size = GRID_SIZE;
             GameBoard.TimeStarted = GameBoard.CurrentStartTime = DateTime.Now;
+            UpdatePlayTime();
             
             //clears the existing grid to a certain size
             clearGrid(GameBoard.Size);
@@ -179,12 +180,13 @@ namespace MinesweeperApp.BusinessServices
         }
 
         /// <summary>
-        /// This method is a getter method for the initial start time of the game.
+        /// This method updates the current timer with the current sessions start time and the time at the moment of the call.
         /// </summary>
-        /// <returns>The current games initial start time.</returns>
-        public DateTime GetStartTime()
+        public void UpdatePlayTime()
         {
-            return GameBoard.TimeStarted;
+            //Update the play time
+            GameBoard.TimePlayed = GameBoard.TimePlayed + (DateTime.Now - GameBoard.CurrentStartTime);
+            GameBoard.CurrentStartTime = DateTime.Now;
         }
 
         /// <summary>

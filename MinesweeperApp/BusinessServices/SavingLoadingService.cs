@@ -18,9 +18,6 @@ namespace MinesweeperApp.BusinessServices
         /// <param name="board">The board object to save to the database.</param>
         public void SaveGame(int userId, Board board)
         {
-            //Update the play time
-            board.TimePlayed = DateTime.Now - board.CurrentStartTime;
-
             //Check for new or previous game save. The board Id will be -1 for new games.
             if (board.Id >= 0)
             {

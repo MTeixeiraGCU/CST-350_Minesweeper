@@ -12,11 +12,11 @@ namespace MinesweeperApp.Models
     public class BoardDTO
     {
         //The database Id for the board.
-        [DisplayName("Id")]
+        [DisplayName("Unique Game Id")]
         public int Id { get; set; }
         
         //Difficulty level for the board
-        [DisplayName("Difficult Level(1 - 3)")]
+        [DisplayName("Difficult Level (Easy = 1, Medium = 2, Hard = 3)")]
         public int Difficulty { get; set; }
 
         //Time that the game initially started at
@@ -24,7 +24,7 @@ namespace MinesweeperApp.Models
         public DateTime TimeStarted { get; set; }
 
         //Current running play time for this game
-        [DisplayName("Current playtime")]
+        [DisplayName("Current running playtime")]
         public TimeSpan TimePlayed { get; set; }
 
         public BoardDTO(int id, int difficulty, DateTime timeStarted, TimeSpan timePlayed)

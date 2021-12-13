@@ -60,7 +60,8 @@ namespace MinesweeperApp.Controllers
 
             //set viewbag variables for the view
             ViewBag.Width = gbs.Size;
-            ViewBag.TimeStarted = gbs.GetStartTime();
+            ViewBag.TimeStarted = gbs.GameBoard.TimeStarted;
+            ViewBag.TimePlayed = gbs.GameBoard.TimePlayed.ToString(@"dd\.hh\:mm\:ss");
 
             return View("GameBoard", gbs.Grid);
         }
@@ -149,6 +150,9 @@ namespace MinesweeperApp.Controllers
         {
             int userId = 1; ///////////////// THIS NEEDS TO BE REMOVED ONCE THERE IS SESSIONS, THE INTEGER SHOULD BE CHANGED TO A VALID USER ID UNTIL THEN
 
+            //update the play time
+            gbs.UpdatePlayTime();
+
             //process the save through the business service
             sls.SaveGame(userId, gbs.GameBoard);
 
@@ -171,7 +175,8 @@ namespace MinesweeperApp.Controllers
 
             //reset the view bag parameters
             ViewBag.Width = gbs.Size;
-            ViewBag.TimeStarted = gbs.GetStartTime();
+            ViewBag.TimeStarted = gbs.GameBoard.TimeStarted;
+            ViewBag.TimePlayed = gbs.GameBoard.TimePlayed.ToString(@"dd\.hh\:mm\:ss");
 
             return View("GameBoard", gbs.Grid);
         }
@@ -246,6 +251,16 @@ namespace MinesweeperApp.Controllers
         public int CheckGrid()
         {
             return (int)State;
+        }
+
+        /// <summary>
+        /// This method updates and returns the current running play time timer
+        /// </summary>
+        /// <returns>A string representing the current play time.</returns>
+        public string UpdateTimer()
+        {
+            gbs.UpdatePlayTime();
+            return gbs.GameBoard.TimePlayed.ToString(@"dd\.hh\:mm\:ss");
         }
 
         /// <summary>

@@ -48,7 +48,7 @@
 
 <div class="time-stamp">
     <p>Time started: @ViewBag.TimeStarted</p>
-    <p>Time Played: Dynamic Timer here!</p>
+    <p id="timer">Time Played: @ViewBag.TimePlayed</p>
 </div>
 
 <form class="game-form" style="margin: auto; width: 80%">
@@ -83,3 +83,22 @@
 
     </div>
 </form>
+
+<script>
+
+    setInterval(myTimer, 1000);
+
+    function myTimer() {
+        $.ajax({
+            type: 'GET',
+            dataType: "text",
+            url: '/game/UpdateTimer',
+            success: function (data) {
+                $('#timer').html("Time played: " + data);
+            },
+            error: function (jq, textError, errorMsg) {
+                console.log(textError + " : " + errorMsg);
+            }
+        });
+    };
+</script>
