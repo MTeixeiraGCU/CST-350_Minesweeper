@@ -11,13 +11,20 @@ namespace MinesweeperApp.BusinessServices
     {
         private static GameBoardDAO gbDAO = new GameBoardDAO();
 
-        //this method will save or update the current game with the given userId
+        /// <summary>
+        /// This method will save or update a board to the database.
+        /// </summary>
+        /// <param name="userId">The user Id to save the game under</param>
+        /// <param name="board">The board object to save to the database.</param>
         public void SaveGame(int userId, Board board)
         {
+            //Update the play time
             board.TimePlayed = DateTime.Now - board.CurrentStartTime;
+
+            //Check for new or previous game save. The board Id will be -1 for new games.
             if (board.Id >= 0)
             {
-                //update previous time
+                //update previous save
                 gbDAO.UpdateSavedBoard(board);
             }
             else
@@ -27,10 +34,14 @@ namespace MinesweeperApp.BusinessServices
             }
         }
 
-        //This method attempts to load a game from the given id
-        public Board LoadGame(int boardId, Board board)
+        /// <summary>
+        /// This method attempts to load a game from the database
+        /// </summary>
+        /// <param name="boardId">The Id of the board to retrieve.</param>
+        /// <returns>A newly created board from the database. Will return null if no boards were found.</returns>
+        public Board LoadGame(int boardId)
         {
-            board = gbDAO.LoadBoard(boardId); //may return null
+            Board board = gbDAO.LoadBoard(boardId); //may return null
 
             //timer for the current session
             board.CurrentStartTime = DateTime.Now;
@@ -38,7 +49,11 @@ namespace MinesweeperApp.BusinessServices
             return board;
         }
 
-        //grabs a list of games from the specified user
+        /// <summary>
+        /// This method grabs a list of games from the database.
+        /// </summary>
+        /// <param name="userId">The user Id to match games against on the database. Will defualt to everyone if left out.</param>
+        /// <returns>A list of games for the given user Id or all saves if no user Id was given.</returns>
         public List<Board> GetGameList(int userId = -1)
         {
             if (userId == -1)
@@ -46,13 +61,21 @@ namespace MinesweeperApp.BusinessServices
             return gbDAO.GetSavesFromUserId(userId);
         }
 
-        //grabs a specific game from the sepcified user
+        /// <summary>
+        /// This method grabs a specific game from the database.
+        /// </summary>
+        /// <param name="boardId">The board Id of the game to search for.</param>
+        /// <returns>A newly created board object of the game found on the database. Will return null if no board was found.</returns>
         public Board GetSaveGame(int boardId)
         {
             return gbDAO.LoadBoard(boardId);
         }
 
-        //removes the given saved game from the database
+        /// <summary>
+        /// This method removes the given saved game from the database.
+        /// </summary>
+        /// <param name="boardId">The Id of the board to remove.</param>
+        /// <returns>true if the board was removed, false otherwise.</returns>
         public bool DeleteSaveGame(int boardId)
         {
             return gbDAO.DeleteBoard(boardId);

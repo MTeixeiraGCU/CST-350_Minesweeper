@@ -47,7 +47,7 @@ namespace MinesweeperApp.Controllers
         /// <summary>
         /// Routing option for creating a board from the given difficulty level.
         /// </summary>
-        /// <param name="options">This will be a difficulty selection of (1 - 3)</param>
+        /// <param name="options">This will be a difficulty selection of (Easy, Medium, Hard)</param>
         /// <returns>A view of the newly created board ready to play.</returns>
         [HttpPost]
         public IActionResult CreateBoard(string options)
