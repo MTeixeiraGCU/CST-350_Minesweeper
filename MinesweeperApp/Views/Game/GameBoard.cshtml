@@ -47,8 +47,12 @@
 }
 
 <div class="time-stamp">
-    <p>Time started: @ViewBag.TimeStarted</p>
-    <p id="timer">Time Played: @ViewBag.TimePlayed</p>
+    <p class="d-inline" style="margin-inline: 7px;">Time started: @ViewBag.TimeStarted</p>
+    <p class="d-inline" id="timer">Time Played: @ViewBag.TimePlayed</p>
+    <form class="d-inline" style="margin-inline: 7px;">
+       
+        <button type="submit" class="btn-primary" asp-controller="Game" asp-action="SaveGame">Save</button>
+    </form>
 </div>
 
 <form class="game-form" style="margin: auto; width: 80%">
