@@ -4,11 +4,12 @@
     <h4>Login was successful</h4>
     <hr />
     <p>Welcome, @Html.DisplayFor(model => model.Username)</p>
-    <p>Click Start</p>
+    <p>Click Start to begin a new game</p>
 </div>
 <div>
-    
-        <a class="begin" asp-controller="Game" asp-action="Index">Start</a><br/>
-        <a asp-controller="Home" asp-action="Index">Back to Home</a>
-    
+        <a class="begin" asp-controller="Game" asp-action="Index">Start</a><br />
+        <a class="begin" style="margin-top: 4px;" asp-controller="Game" asp-action="SavedGameList">View Saves</a>
+</div>
+<div>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
 </div>
