@@ -5,7 +5,7 @@
         e.preventDefault();
     });
 
-    //removes form submitting on the gameboard
+    //removes form submitting on the gameboard. Submitting the form has been depracated
     $(".game-form").submit(function (e) {
         e.preventDefault();
     });
@@ -47,16 +47,22 @@ function doButtonUpdate(buttonNumber, urlString, cellCallback) {
     });
 };
 
+//callback method to process all revealed cells for a given move. Must be preformed before win logic can proceed.
 function updateCells(cells) {
+
+    //setup for detecting completion of updates
     var promises = [];
 
+    //perform all partial update ajax calls
     cells.forEach(function (cell) {
         promises.push(updateCell(cell));
     });
+
+    //Once all partial loads have been complete, process a win check.
     Promise.all(promises).then(checkWinCondition);
 }
 
-//this method will cycle through and update all the cells images
+//this method produces a partial page load on the given button.
 function updateCell(buttonNumber) {
     return $.ajax({
         type: 'GET',
