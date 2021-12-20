@@ -10,16 +10,16 @@ namespace MinesweeperApp.DatabaseServices
     /// <summary>
     /// This class handles processing database exchanges for game board data.
     /// </summary>
-    public class GameBoardDAO
+    public class GameBoardLocalSqlDAO : IGameBoardDAO
     {
         //Connection string to local VS created MySQL database
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         /// <summary>
         /// This method returns all of the found save games in the entire database.
         /// </summary>
         /// <returns>A complete list of save games from the database.</returns>
-        public List<Board> GetAllGameSaves()
+        public List<Board> GetAll()
         {
             List<Board> boards = new List<Board>();
 
@@ -61,9 +61,9 @@ namespace MinesweeperApp.DatabaseServices
         /// <summary>
         /// This method retrieves all of the save games owned by the given user Id
         /// </summary>
-        /// <param name="id">The user Id to cross check save games for.</param>
+        /// <param name="userId">The user Id to cross check save games for.</param>
         /// <returns>A list of all the save games from a particular user.</returns>
-        public List<Board> GetSavesFromUserId(int id)
+        public List<Board> GetFromUserId(int userId)
         {
             List<Board> boards = new List<Board>();
 
@@ -73,7 +73,7 @@ namespace MinesweeperApp.DatabaseServices
             {
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.Add("@id", System.Data.SqlDbType.Int).Value = id;
+                command.Parameters.Add("@id", System.Data.SqlDbType.Int).Value = userId;
 
                 try
                 {
@@ -110,7 +110,7 @@ namespace MinesweeperApp.DatabaseServices
         /// <param name="board">The board object to enter into the database.</param>
         /// <param name="userId">The user Id to store the given board under.</param>
         /// <returns>Result integer of the newly saved boards unique Id.</returns>
-        public int SaveBoard(Board board, int userId)
+        public int Add(Board board, int userId)
         {
             int results = -1; //Holds the new ID for this particular board or -1 if insert failed
 
@@ -155,7 +155,7 @@ namespace MinesweeperApp.DatabaseServices
         /// </summary>
         /// <param name="board">The board information to update the database with.</param>
         /// <returns>Boolean value representing a successful update. true being success and false otherwise.</returns>
-        public bool UpdateSavedBoard(Board board)
+        public bool Update(Board board)
         {
             bool results = false;
 
@@ -192,7 +192,7 @@ namespace MinesweeperApp.DatabaseServices
         /// </summary>
         /// <param name="boardId">The Id of the board to load from the database.</param>
         /// <returns>A newly created board object from the recieved data in the database.</returns>
-        public Board LoadBoard(int boardId)
+        public Board Get(int boardId)
         {
             Board board = null;
 
@@ -237,7 +237,7 @@ namespace MinesweeperApp.DatabaseServices
         /// </summary>
         /// <param name="boardId">The Id of the board to remove from the database.</param>
         /// <returns>Boolean value representing a successful deletion. true if the board was removed, false otherwise.</returns>
-        public bool DeleteBoard(int boardId)
+        public bool Delete(int boardId)
         {
             bool isDeleted = false;
 

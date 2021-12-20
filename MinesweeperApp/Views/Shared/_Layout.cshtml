@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -18,16 +20,41 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1 ml-auto">
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="About">About</a>
                         </li>
+                        @if (Context.Session.GetInt32("userId") != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Game" asp-action="Index">Game</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="GameAPI" asp-action="Index">API</a>
                         </li>
+                    </ul>
+                </div>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1 mr-auto">
+                        @if (Context.Session.GetInt32("userId") != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light navbar-right" asp-area="" asp-controller="Login" asp-action="Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light navbar-right" asp-area="" asp-controller="Login" asp-action="Index">Sign In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light navbar-right" asp-area="" asp-controller="Registration" asp-action="Index">Sign Up</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

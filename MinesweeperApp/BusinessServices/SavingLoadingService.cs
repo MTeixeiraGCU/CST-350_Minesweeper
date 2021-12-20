@@ -2,14 +2,17 @@
 using MinesweeperApp.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MinesweeperApp.BusinessServices
 {
     public class SavingLoadingService
     {
-        private static GameBoardDAO gbDAO = new GameBoardDAO();
+        private IGameBoardDAO gbDAO;
+
+        public SavingLoadingService(IGameBoardDAO gameBoardDAO)
+        {
+            gbDAO = gameBoardDAO;
+        }
 
         /// <summary>
         /// This method will save or update a board to the database.
@@ -22,12 +25,12 @@ namespace MinesweeperApp.BusinessServices
             if (board.Id >= 0)
             {
                 //update previous save
-                gbDAO.UpdateSavedBoard(board);
+                gbDAO.Update(board);
             }
             else
             {
                 //new game save
-                board.Id = gbDAO.SaveBoard(board, userId);
+                board.Id = gbDAO.Add(board, userId);
             }
         }
 
@@ -38,7 +41,7 @@ namespace MinesweeperApp.BusinessServices
         /// <returns>A newly created board from the database. Will return null if no boards were found.</returns>
         public Board LoadGame(int boardId)
         {
-            Board board = gbDAO.LoadBoard(boardId); //may return null
+            Board board = gbDAO.Get(boardId); //may return null
 
             //timer for the current session
             board.CurrentStartTime = DateTime.Now;
@@ -54,8 +57,8 @@ namespace MinesweeperApp.BusinessServices
         public List<Board> GetGameList(int userId = -1)
         {
             if (userId == -1)
-                return gbDAO.GetAllGameSaves();
-            return gbDAO.GetSavesFromUserId(userId);
+                return gbDAO.GetAll();
+            return gbDAO.GetFromUserId(userId);
         }
 
         /// <summary>
@@ -65,17 +68,20 @@ namespace MinesweeperApp.BusinessServices
         /// <returns>A newly created board object of the game found on the database. Will return null if no board was found.</returns>
         public Board GetSaveGame(int boardId)
         {
-            return gbDAO.LoadBoard(boardId);
+            return gbDAO.Get(boardId);
         }
 
         /// <summary>
         /// This method removes the given saved game from the database.
         /// </summary>
+        /// <param name="userId">The user id to check against the board to be deleted. Will not delete the board if the given user does not own it.</param>
         /// <param name="boardId">The Id of the board to remove.</param>
         /// <returns>true if the board was removed, false otherwise.</returns>
-        public bool DeleteSaveGame(int boardId)
+        public bool DeleteSaveGame(int userId, int boardId)
         {
-            return gbDAO.DeleteBoard(boardId);
+            if(gbDAO.GetFromUserId(userId).Exists(board => board.Id == boardId))
+                return gbDAO.Delete(boardId);
+            return false;
         }
     }
 }

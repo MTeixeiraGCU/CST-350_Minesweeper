@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MinesweeperApp.BusinessServices;
 using MinesweeperApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MinesweeperApp.Controllers
 {
     /// <summary>
     /// This class controller is designed to process routing for the registration module
     /// </summary>
+    [CustomAuthorization(LogOutRequired = true)]
     public class RegistrationController : Controller
     {
         /// <summary>
@@ -30,10 +27,10 @@ namespace MinesweeperApp.Controllers
         public IActionResult ProcessRegistration(User user)
         {
             //Registration business service object creation
-            RegistrationBusinessService rbs = new RegistrationBusinessService();
+            RegistrationBusinessService rbs = new RegistrationBusinessService(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
 
             //Check for duplicate username
-            if(!rbs.CheckUsernameAvailability(user.Username))
+            if (!rbs.CheckUsernameAvailability(user.Username))
             {
                 ModelState.AddModelError("Username", "That username has already been taken!");
             }

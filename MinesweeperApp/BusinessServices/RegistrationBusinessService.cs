@@ -1,9 +1,5 @@
 ﻿using MinesweeperApp.DatabaseServices;
 using MinesweeperApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MinesweeperApp.BusinessServices
 {
@@ -13,7 +9,7 @@ namespace MinesweeperApp.BusinessServices
     public class RegistrationBusinessService
     {
         //Database service object for users
-        UserDAO userDAO = new UserDAO();
+        UserLocalSqlDAO userDAO = new UserLocalSqlDAO(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
 
         /// <summary>
         /// Takes in a user object and attempts to add them to the database. Does not create login status.

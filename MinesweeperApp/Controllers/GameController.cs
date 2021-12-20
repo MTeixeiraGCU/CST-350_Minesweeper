@@ -1,23 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using MinesweeperApp.BusinessServices;
+using MinesweeperApp.DatabaseServices;
 using MinesweeperApp.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MinesweeperApp.Controllers
 {
     /// <summary>
     /// This class controller supprots routing while playing a game of minesweeper.
     /// </summary>
+    [CustomAuthorization(LogOutRequired = false)]
     public class GameController : Controller
     {
+
         //Business service object to handle game logic and board updates.
-        static GameboardBusinessService gbs = new GameboardBusinessService();
+        private static GameboardBusinessService gbs = new GameboardBusinessService(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
 
         //Business service object to handle loading and saving games.
-        static SavingLoadingService sls = new SavingLoadingService();
+        private static SavingLoadingService sls = new SavingLoadingService(new GameBoardLocalSqlDAO()); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
 
         /// <summary>
         /// This enum holds the different states that a game can be in
@@ -148,13 +150,11 @@ namespace MinesweeperApp.Controllers
         /// <returns>A view containing the current grid that the user is playing</returns>
         public IActionResult SaveGame()
         {
-            int userId = 1; ///////////////// THIS NEEDS TO BE REMOVED ONCE THERE IS SESSIONS, THE INTEGER SHOULD BE CHANGED TO A VALID USER ID UNTIL THEN
-
             //update the play time
             gbs.UpdatePlayTime();
 
             //process the save through the business service
-            sls.SaveGame(userId, gbs.GameBoard);
+            sls.SaveGame((int)HttpContext.Session.GetInt32("userId"), gbs.GameBoard);
 
             //reload the game to return to the existing game board.
             return LoadGame(gbs.GameBoard.Id);
@@ -188,7 +188,7 @@ namespace MinesweeperApp.Controllers
         /// <returns>A view of all the remaing games owned by the currently logged in user</returns>
         public IActionResult DeleteGame(int boardId)
         {
-            sls.DeleteSaveGame(boardId);
+            sls.DeleteSaveGame((int)HttpContext.Session.GetInt32("userId"), boardId);
 
             return SavedGameList();
         }
@@ -199,10 +199,8 @@ namespace MinesweeperApp.Controllers
         /// <returns>A view list containing all the game saves for the currently logged in user.</returns>
         public IActionResult SavedGameList()
         {
-            int userId = 1; ///////////////// THIS NEEDS TO BE REMOVED ONCE THERE IS SESSIONS, THE INTEGER SHOULD BE CHANGED TO A VALID USER ID UNTIL THEN
-
             //Grab the list of saves for this user.
-            List<Board> boardList = sls.GetGameList(userId);
+            List<Board> boardList = sls.GetGameList((int)HttpContext.Session.GetInt32("userId"));
 
             //convert the list into publicly viewable DTO objects
             IEnumerable<BoardDTO> list = from b in boardList

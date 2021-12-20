@@ -1,12 +1,11 @@
 ﻿using MinesweeperApp.BusinessServices;
 using MinesweeperApp.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http.Description;
+using MinesweeperApp.DatabaseServices;
+using Microsoft.AspNetCore.Http;
 
 namespace MinesweeperApp.Controllers
 {
@@ -24,7 +23,7 @@ namespace MinesweeperApp.Controllers
 
         public GameAPIController()
         {
-            sls = new SavingLoadingService();
+            sls = new SavingLoadingService(new GameBoardLocalSqlDAO()); /////////////////////////////////////// This line needs injection to replace the new keyword ///////////////////////////////////////////
         }
 
         /// <summary>
@@ -49,8 +48,7 @@ namespace MinesweeperApp.Controllers
         [HttpGet("showSavedGames")]
         public IEnumerable<BoardDTO> ShowSavedGames()
         {
-            int userId = 1; ///////////////// THIS NEEDS TO BE REMOVED ONCE THERE IS SESSIONS, THE INTEGER SHOULD BE CHANGED TO A VALID USER ID UNTIL THEN
-
+            int userId = HttpContext.Session.GetInt32("userId") == null ? -1 : (int)HttpContext.Session.GetInt32("userId");
             List<Board> boardList = sls.GetGameList(userId);
             IEnumerable<BoardDTO> boardDTOList = from b in boardList
                                                  select
@@ -78,10 +76,11 @@ namespace MinesweeperApp.Controllers
         /// <param name="boardId">The game id to remove from the database</param>
         /// <returns>A boolean value with true as the game was successfully removed and false otherwise</returns>
         [HttpGet("deleteOneGame/{boardId}")]
+        [CustomAuthorization]
         [ResponseType(typeof(bool))]
         public bool DeleteGame(int boardId)
         {
-            return sls.DeleteSaveGame(boardId);
+            return sls.DeleteSaveGame((int)HttpContext.Session.GetInt32("userId"), boardId);
         }
 
        

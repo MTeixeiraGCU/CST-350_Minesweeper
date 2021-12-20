@@ -1,8 +1,18 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Please <a asp-controller="Login" asp-action="Index">Login</a> or <a asp-controller="Registration" asp-action="Index">Register</a> to start playing.</p>
+    @if (Context.Session.GetInt32("userId") == null)
+    {
+        <p>Please <a asp-controller = 'Login' asp-action='Index'> Login </a> or <a asp-controller='Registration' asp-action='Index'> Register </a> to start playing.</p>
+    }
+    else
+    {
+        <h3>@Context.Session.GetString("username")</h3>
+    }
+
 </div>

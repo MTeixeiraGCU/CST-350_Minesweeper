@@ -1,19 +1,16 @@
 ﻿using MinesweeperApp.Models;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MinesweeperApp.DatabaseServices
 {
     /// <summary>
     /// This class handles database entries and processing for user objects
     /// </summary>
-    public class UserDAO
+    public class UserLocalSqlDAO : IUserDAO
     {
         //Connection string to local VS created MySQL database
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         /// <summary>
         /// This method retrieves a user's complete information from the given user name and password.
@@ -58,9 +55,9 @@ namespace MinesweeperApp.DatabaseServices
         /// <summary>
         /// This metthod finds the user's unique Id from thier chosen userName.
         /// </summary>
-        /// <param name="username">The name that the user chose during registration.</param>
+        /// <param name="userName">The name that the user chose during registration.</param>
         /// <returns>The found Id that matches the user's unique userName. returns -1 if no entries were found.</returns>
-        public int GetIdFromUsername(string username)
+        public int GetIdFromUsername(string userName)
         {
             int id = -1;
 
@@ -70,7 +67,7 @@ namespace MinesweeperApp.DatabaseServices
             {
                 SqlCommand command = new SqlCommand(query, connection);
 
-                command.Parameters.Add("@username", System.Data.SqlDbType.VarChar, 40).Value = username;
+                command.Parameters.Add("@username", System.Data.SqlDbType.VarChar, 40).Value = userName;
 
                 try
                 {
