@@ -40,6 +40,10 @@
         left: 50%;
         transform: translate(-50%, -65%);
     }
+
+    .time-stamp {
+        margin: 10px;
+    }
 </style>
 
 @{
@@ -49,10 +53,12 @@
 <div class="time-stamp">
     <p class="d-inline" style="margin-inline: 7px;">Time started: @ViewBag.TimeStarted</p>
     <p class="d-inline" id="timer">Time Played: @ViewBag.TimePlayed</p>
+
     <form class="d-inline" style="margin-inline: 7px;">
        
-        <button type="submit" class="btn-primary" asp-controller="Game" asp-action="SaveGame">Save</button>
+        <button type="submit" class="begin" asp-controller="Game" asp-action="SaveGame">Save</button>
     </form>
+
 </div>
 
 <form class="game-form" style="margin: auto; width: 80%">
