@@ -9,7 +9,7 @@ namespace MinesweeperApp.BusinessServices
     public class LoginBusinessService
     {
         //Database service object for users
-        UserLocalSqlDAO userDAO = new UserLocalSqlDAO(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
+        IUserDAO userDAO = new UserMySqlDAO(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
 
         /// <summary>
         /// This method takes in a user object and attempts to validate thier credintials against the database.
