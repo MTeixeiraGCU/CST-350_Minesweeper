@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace MinesweeperApp.Models
 {
@@ -22,6 +23,7 @@ namespace MinesweeperApp.Models
 
         //Current running play time for this game
         [DisplayName("Current running playtime")]
+        [DisplayFormat(DataFormatString="{0:hh\\:mm\\:ss}")]
         public TimeSpan TimePlayed { get; set; }
 
         public BoardDTO(int id, int difficulty, DateTime timeStarted, TimeSpan timePlayed)
