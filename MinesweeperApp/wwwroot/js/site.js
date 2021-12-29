@@ -77,7 +77,7 @@ function updateCell(buttonNumber) {
             error: function (jq, textError, errorMsg) {
                 console.log(textError + " : " + errorMsg);
             },
-            timeout: 1000
+            timeout: 3000
         })
         .then(function (data) {
             console.log("Cell: " + buttonNumber + " was Updated!");
