@@ -141,7 +141,7 @@ namespace MinesweeperApp.DatabaseServices
         {
             int results = -1; //Holds the new ID for this particular board or -1 if insert failed
 
-            string query = "INSERT INTO boards (USER_ID, SIZE, DIFFICULTY, NUMBEROFMINES, GRID, TIMESTARTED, TIMEPLAYED) OUTPUT INSERTED.ID VALUES (@user, @size, @difficulty, @numberofmines, @grid, @timestarted, @timeplayed);";
+            string query = "INSERT INTO boards (USER_ID, SIZE, DIFFICULTY, NUMBEROFMINES, GRID, TIMESTARTED, TIMEPLAYED) VALUES (@user, @size, @difficulty, @numberofmines, @grid, @timestarted, @timeplayed); SELECT LAST_INSERT_ID()";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -163,7 +163,15 @@ namespace MinesweeperApp.DatabaseServices
 
                     if (affectedRow != null)
                     {
-                        results = (int)affectedRow;
+                        //special case for newer MySQL servers returning BIGINT
+                        if(affectedRow.GetType() == typeof(ulong))
+                        {
+                            results = Convert.ToInt32(affectedRow);
+                        }
+                        else
+                        {
+                            results = (int)affectedRow;
+                        }
                     }
 
                     connection.Close();
