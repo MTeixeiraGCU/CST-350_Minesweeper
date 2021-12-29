@@ -19,11 +19,11 @@ namespace MinesweeperApp.Controllers
     {
 
         //Business service in charge of loading and saving Board objects.
-        SavingLoadingService sls;
+        private SavingLoadingService sls;
 
-        public GameAPIController()
+        public GameAPIController(SavingLoadingService sls)
         {
-            sls = new SavingLoadingService(new GameBoardLocalSqlDAO()); /////////////////////////////////////// This line needs injection to replace the new keyword ///////////////////////////////////////////
+            this.sls = sls;
         }
 
         /// <summary>

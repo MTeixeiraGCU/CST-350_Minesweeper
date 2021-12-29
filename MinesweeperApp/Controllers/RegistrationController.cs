@@ -10,6 +10,13 @@ namespace MinesweeperApp.Controllers
     [CustomAuthorization(LogOutRequired = true)]
     public class RegistrationController : Controller
     {
+        private RegistrationBusinessService rbs;
+
+        public RegistrationController(RegistrationBusinessService rbs)
+        {
+            this.rbs = rbs;
+        }
+
         /// <summary>
         /// Intial registration module entry point route.
         /// </summary>
@@ -26,9 +33,6 @@ namespace MinesweeperApp.Controllers
         /// <returns>A view based on successful registration or returns to the registration form with errors.</returns>
         public IActionResult ProcessRegistration(User user)
         {
-            //Registration business service object creation
-            RegistrationBusinessService rbs = new RegistrationBusinessService(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
-
             //Check for duplicate username
             if (!rbs.CheckUsernameAvailability(user.Username))
             {
