@@ -9,7 +9,12 @@ namespace MinesweeperApp.BusinessServices
     public class RegistrationBusinessService
     {
         //Database service object for users
-        UserLocalSqlDAO userDAO = new UserLocalSqlDAO(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
+        private IUserDAO userDAO;
+
+        public RegistrationBusinessService(IUserDAO userDAO)
+        {
+            this.userDAO = userDAO;
+        }
 
         /// <summary>
         /// Takes in a user object and attempts to add them to the database. Does not create login status.

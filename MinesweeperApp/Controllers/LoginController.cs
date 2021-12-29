@@ -10,6 +10,13 @@ namespace MinesweeperApp.Controllers
     /// </summary>
     public class LoginController : Controller
     {
+        private LoginBusinessService lbs;
+
+        public LoginController(LoginBusinessService lbs)
+        {
+            this.lbs = lbs;
+        }
+
         /// <summary>
         /// Routing path for the intial login page.
         /// </summary>
@@ -28,8 +35,6 @@ namespace MinesweeperApp.Controllers
         [CustomAuthorization(LogOutRequired = true)]
         public IActionResult ProcessLogin(User user)
         {
-            LoginBusinessService lbs = new LoginBusinessService();  /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
-
             //validate the user
             user.Id = lbs.ValidateLogin(user);
 

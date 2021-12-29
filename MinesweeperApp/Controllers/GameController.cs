@@ -16,10 +16,10 @@ namespace MinesweeperApp.Controllers
     {
 
         //Business service object to handle game logic and board updates.
-        private static GameboardBusinessService gbs = new GameboardBusinessService(); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
+        private GameboardBusinessService gbs;
 
         //Business service object to handle loading and saving games.
-        private static SavingLoadingService sls = new SavingLoadingService(new GameBoardLocalSqlDAO()); /////////////////////////////// NEEDS TO BE INJECTED LATER //////////////////////////////////////////////
+        private SavingLoadingService sls;
 
         /// <summary>
         /// This enum holds the different states that a game can be in
@@ -36,6 +36,12 @@ namespace MinesweeperApp.Controllers
 
         //Internal list of cells that need to be visually updated after a move has been made
         private List<int> updatedCells;
+
+        public GameController(GameboardBusinessService gbs, SavingLoadingService sls)
+        {
+            this.gbs = gbs;
+            this.sls = sls;
+        }
 
         /// <summary>
         /// Default routing for this controller.

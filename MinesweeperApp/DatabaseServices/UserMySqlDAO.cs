@@ -1,37 +1,42 @@
 ﻿using MinesweeperApp.Models;
+using MySqlConnector;
 using System;
-using System.Data.SqlClient;
 
 namespace MinesweeperApp.DatabaseServices
 {
     /// <summary>
-    /// This class handles database entries and processing for user objects
+    /// Implementation of the IUserDAO using a MySql database structure.
     /// </summary>
-    public class UserLocalSqlDAO : IUserDAO
+    public class UserMySqlDAO : IUserDAO
     {
-        //Connection string to local VS created MySQL database
-        private string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MinesweeperApp;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private static string database_server = Environment.GetEnvironmentVariable("DATABASE_SERVER_NAME");
+        private static string database_userId = Environment.GetEnvironmentVariable("DATABASE_USER_ID");
+        private static string database_password = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
+        private static string database_schema = Environment.GetEnvironmentVariable("DATABASE_SCHEMA");
+        private static string database_port = Environment.GetEnvironmentVariable("DATABASE_PORT");
 
-        
+        //MySQL database connection string.
+        private static string connectionString = "server=" + database_server + ";UserId=" + database_userId + ";password=" + database_password + ";database=" + database_schema + ";port=" + database_port;
+
         public bool FindUserByUsernameAndPassword(string userName, string password)
         {
             bool success = false;
-            
+
             string query = "SELECT * FROM users WHERE USERNAME = @username and PASSWORD = @password";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
 
-                command.Parameters.Add("@username", System.Data.SqlDbType.NChar, 40).Value = userName;
-                command.Parameters.Add("@password", System.Data.SqlDbType.NChar, 40).Value = password;
+                command.Parameters.Add(new MySqlParameter("@username", userName));
+                command.Parameters.Add(new MySqlParameter("@password", password));
 
                 try
                 {
                     connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+                    MySqlDataReader reader = command.ExecuteReader();
 
-                    if(reader.HasRows)
+                    if (reader.HasRows)
                     {
                         success = true;
                     }
@@ -53,16 +58,16 @@ namespace MinesweeperApp.DatabaseServices
 
             string query = "SELECT * FROM users WHERE USERNAME = @username";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
 
-                command.Parameters.Add("@username", System.Data.SqlDbType.VarChar, 40).Value = userName;
+                command.Parameters.Add(new MySqlParameter("@username", userName));
 
                 try
                 {
                     connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+                    MySqlDataReader reader = command.ExecuteReader();
 
                     if (reader.HasRows)
                     {
@@ -87,16 +92,16 @@ namespace MinesweeperApp.DatabaseServices
 
             string query = "SELECT * FROM users WHERE EMAIL = @email";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
 
-                command.Parameters.Add("@email", System.Data.SqlDbType.VarChar, 40).Value = email;
+                command.Parameters.Add(new MySqlParameter("@email", email));
 
                 try
                 {
                     connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+                    MySqlDataReader reader = command.ExecuteReader();
 
                     if (reader.HasRows)
                     {
@@ -121,18 +126,18 @@ namespace MinesweeperApp.DatabaseServices
 
             string query = "INSERT INTO users (USERNAME, PASSWORD, FIRSTNAME, LASTNAME, EMAIL, SEX, AGE, STATE) VALUES (@username, @password, @firstname, @lastname, @email, @sex, @age, @state)";
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(query, connection);
+                MySqlCommand command = new MySqlCommand(query, connection);
 
-                command.Parameters.Add("@username", System.Data.SqlDbType.NVarChar, 40).Value = user.Username;
-                command.Parameters.Add("@password", System.Data.SqlDbType.NVarChar, 40).Value = user.Password;
-                command.Parameters.Add("@firstname", System.Data.SqlDbType.VarChar, 40).Value = user.FirstName;
-                command.Parameters.Add("@lastname", System.Data.SqlDbType.NVarChar, 40).Value = user.LastName;
-                command.Parameters.Add("@email", System.Data.SqlDbType.NVarChar, 40).Value = user.Email;
-                command.Parameters.Add("@sex", System.Data.SqlDbType.NVarChar, 10).Value = user.Sex;
-                command.Parameters.Add("@age", System.Data.SqlDbType.Int).Value = user.Age;
-                command.Parameters.Add("@state", System.Data.SqlDbType.NVarChar, 10).Value = user.State;
+                command.Parameters.Add(new MySqlParameter("@username", user.Username));
+                command.Parameters.Add(new MySqlParameter("@password", user.Password));
+                command.Parameters.Add(new MySqlParameter("@firstname", user.FirstName));
+                command.Parameters.Add(new MySqlParameter("@lastname", user.LastName));
+                command.Parameters.Add(new MySqlParameter("@email", user.Email));
+                command.Parameters.Add(new MySqlParameter("@sex", user.Sex));
+                command.Parameters.Add(new MySqlParameter("@age", user.Age));
+                command.Parameters.Add(new MySqlParameter("@state", user.State));
 
                 try
                 {
