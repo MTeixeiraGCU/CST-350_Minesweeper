@@ -1,6 +1,7 @@
 ﻿using MinesweeperApp.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MinesweeperApp.BusinessServices
 {
@@ -9,13 +10,6 @@ namespace MinesweeperApp.BusinessServices
     /// </summary>
     public class GameboardBusinessService
     {
-        //The square size of the game board
-        public int Size {
-            get {
-                return GameBoard.Size;
-            }
-        }
-
         //The game board object of the current game
         public Board GameBoard { get; set; }
 
@@ -184,6 +178,52 @@ namespace MinesweeperApp.BusinessServices
             //Update the play time
             GameBoard.TimePlayed = GameBoard.TimePlayed + (DateTime.Now - GameBoard.CurrentStartTime);
             GameBoard.CurrentStartTime = DateTime.Now;
+        }
+
+        /// <summary>
+        /// This method takes the current GameBoard and serializes it into a string.
+        /// </summary>
+        /// <returns>The complete GameBoard serialized into a string with each property on a single line.</returns>
+        public string SerializeGameBoard()
+        {
+            StringWriter sw = new StringWriter();
+
+            sw.WriteLine(GameBoard.Id);
+            sw.WriteLine(GameBoard.Size);
+            sw.WriteLine(GameBoard.Difficulty);
+            sw.WriteLine(GameBoard.NumberOfMines);
+            sw.WriteLine(GameBoard.TimeStarted);
+            sw.WriteLine(GameBoard.CurrentStartTime);
+            sw.WriteLine(GameBoard.TimePlayed);
+            sw.Write(Board.SerializeGridToString(GameBoard.Grid, GameBoard.Size, GameBoard.Size));
+
+            return sw.ToString();
+        }
+
+        /// <summary>
+        /// This method takes in a string and attempts to parse a GameBoard from each line of the string.
+        /// </summary>
+        /// <param name="str">A potential Serialized GameBoard.</param>
+        public void DeserializeGameBoard(string str)
+        {
+            StringReader sr = new StringReader(str);
+
+            //try to parse data out of the string
+            try
+            {
+                GameBoard.Id = int.Parse(sr.ReadLine());
+                GameBoard.Size = int.Parse(sr.ReadLine());
+                GameBoard.Difficulty = int.Parse(sr.ReadLine());
+                GameBoard.NumberOfMines = int.Parse(sr.ReadLine());
+                GameBoard.TimeStarted = DateTime.Parse(sr.ReadLine());
+                GameBoard.CurrentStartTime = DateTime.Parse(sr.ReadLine());
+                GameBoard.TimePlayed = TimeSpan.Parse(sr.ReadLine());
+                GameBoard.Grid = Board.DeserializeGridFromString(sr.ReadToEnd());
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error while deserializing game board! \n" + ex.Message);
+            }
         }
 
         /// <summary>

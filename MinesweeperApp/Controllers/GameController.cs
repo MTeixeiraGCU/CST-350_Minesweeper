@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MinesweeperApp.BusinessServices;
-using MinesweeperApp.DatabaseServices;
 using MinesweeperApp.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,13 +25,11 @@ namespace MinesweeperApp.Controllers
         /// </summary>
         public enum GameState
         {
+            None = -1,
             Won = 0,
             Lost = 1,
             Playing = 2
         }
-
-        //Flag to determine what state the game is currently in
-        static GameState State;
 
         //Internal list of cells that need to be visually updated after a move has been made
         private List<int> updatedCells;
@@ -64,10 +61,13 @@ namespace MinesweeperApp.Controllers
             gbs.NewGame(options);
 
             //set the game state to playing
-            State = GameState.Playing;
+            HttpContext.Session.SetInt32("gameState", (int)GameState.Playing);
+
+            //create a persistent game board
+            HttpContext.Session.SetString("board", gbs.SerializeGameBoard());
 
             //set viewbag variables for the view
-            ViewBag.Width = gbs.Size;
+            ViewBag.Width = gbs.GameBoard.Size;
             ViewBag.TimeStarted = gbs.GameBoard.TimeStarted;
             ViewBag.TimePlayed = gbs.GameBoard.TimePlayed.ToString(@"dd\.hh\:mm\:ss");
 
@@ -83,7 +83,7 @@ namespace MinesweeperApp.Controllers
         {
             //will simply reload the gameboard on a click
 
-            ViewBag.Width = gbs.Size;
+            ViewBag.Width = gbs.GameBoard.Size;
             return View("GameBoard", gbs.Grid);
         }
 
@@ -95,26 +95,32 @@ namespace MinesweeperApp.Controllers
         public JsonResult HandleButtonLeftClick(string buttonNumber)
         {
             //Parse the Id back to Integer
-            int id = int.Parse(buttonNumber);
+            int buttonId = int.Parse(buttonNumber);
 
             //reset the list of altered cells
             updatedCells = new List<int>();
 
             //Check for a good game state
-            if (State == GameState.Playing)
+            if ((GameState)CheckGrid() == GameState.Playing)
             {
+                //get the persistent game board
+                gbs.DeserializeGameBoard(HttpContext.Session.GetString("board"));
+
                 //make the move on the game board
-                if (gbs.MakeMove(id, updateCell))
+                if (gbs.MakeMove(buttonId, updateCell))
                 {
                     //A mine was hit so set the proper flag and reveal all the cells
-                    State = GameState.Lost;
+                    HttpContext.Session.SetInt32("gameState", (int)GameState.Lost);
                     gbs.RevealAll(updateCell);
                 }
                 else if (gbs.CheckForWin())
                 {
                     //A win was detected so set the proper game state.
-                    State = GameState.Won;
+                    HttpContext.Session.SetInt32("gameState", (int)GameState.Won);
                 }
+
+                //update persistent game board
+                HttpContext.Session.SetString("board", gbs.SerializeGameBoard());
             }
 
             return  Json(updatedCells);
@@ -134,17 +140,24 @@ namespace MinesweeperApp.Controllers
             updatedCells = new List<int>();
 
             //check for a good game state
-            if (State == GameState.Playing)
+            if ((GameState)CheckGrid() == GameState.Playing)
             {
+                //get the persistent game board
+                gbs.DeserializeGameBoard(HttpContext.Session.GetString("board"));
+
                 //toggle a flag on the cell the user clicked
                 gbs.ToggleFlag(id);
 
                 //check for a win condition and set the state if it was achieved
                 if (gbs.CheckForWin())
-                    State = GameState.Won;
+                    //A win was detected so set the proper game state.
+                    HttpContext.Session.SetInt32("gameState", (int)GameState.Won);
 
                 //add the altered cell to the update list
                 updatedCells.Add(id);
+
+                //create a persistent game board
+                HttpContext.Session.SetString("board", gbs.SerializeGameBoard());
             }
 
             return Json(updatedCells);
@@ -156,11 +169,18 @@ namespace MinesweeperApp.Controllers
         /// <returns>A view containing the current grid that the user is playing</returns>
         public IActionResult SaveGame()
         {
-            //update the play time
-            gbs.UpdatePlayTime();
+            //if we are still playing we can save the game
+            if ((GameState)CheckGrid() == GameState.Playing)
+            {
+                //get the persistent game board
+                gbs.DeserializeGameBoard(HttpContext.Session.GetString("board"));
 
-            //process the save through the business service
-            sls.SaveGame((int)HttpContext.Session.GetInt32("userId"), gbs.GameBoard);
+                //update the play time
+                gbs.UpdatePlayTime();
+
+                //process the save through the business service
+                sls.SaveGame((int)HttpContext.Session.GetInt32("userId"), gbs.GameBoard);
+            }
 
             //reload the game to return to the existing game board.
             return LoadGame(gbs.GameBoard.Id);
@@ -173,14 +193,17 @@ namespace MinesweeperApp.Controllers
         /// <returns>A view of the grid so that the user can continue to play.</returns>
         public IActionResult LoadGame(int boardId)
         {
-            //Grab the game board fro the loading business service
+            //Grab the game board from the loading business service
             gbs.GameBoard = sls.LoadGame(boardId);
 
             //set the state to for continued playing
-            State = GameState.Playing;
+            HttpContext.Session.SetInt32("gameState", (int)GameState.Playing);
+
+            //create persistent game board
+            HttpContext.Session.SetString("board", gbs.SerializeGameBoard());
 
             //reset the view bag parameters
-            ViewBag.Width = gbs.Size;
+            ViewBag.Width = gbs.GameBoard.Size;
             ViewBag.TimeStarted = gbs.GameBoard.TimeStarted;
             ViewBag.TimePlayed = gbs.GameBoard.TimePlayed.ToString(@"dd\.hh\:mm\:ss");
 
@@ -227,6 +250,9 @@ namespace MinesweeperApp.Controllers
             //Parse the Id from the button number
             int id = int.Parse(buttonNumber);
 
+            //get the persistent game board
+            gbs.DeserializeGameBoard(HttpContext.Session.GetString("board"));
+
             return PartialView("SingleButton", gbs.Grid.ElementAt(id));
         }
 
@@ -254,7 +280,7 @@ namespace MinesweeperApp.Controllers
         /// <returns>The game state of the current board.</returns>
         public int CheckGrid()
         {
-            return (int)State;
+            return HttpContext.Session.GetInt32("gameState") == null ? -1 : (int)HttpContext.Session.GetInt32("gameState");
         }
 
         /// <summary>
@@ -263,7 +289,14 @@ namespace MinesweeperApp.Controllers
         /// <returns>A string representing the current play time.</returns>
         public string UpdateTimer()
         {
+            //get the persistent game board
+            gbs.DeserializeGameBoard(HttpContext.Session.GetString("board"));
+
             gbs.UpdatePlayTime();
+
+            //update persistent game board
+            HttpContext.Session.SetString("board", gbs.SerializeGameBoard());
+            
             return gbs.GameBoard.TimePlayed.ToString(@"dd\.hh\:mm\:ss");
         }
 
