@@ -1,16 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MinesweeperApp.BusinessServices;
 using MinesweeperApp.DatabaseServices;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MinesweeperApp
 {
@@ -35,8 +30,13 @@ namespace MinesweeperApp
                 options.Cookie.IsEssential = true;
             });
 
+#if DEBUG
             services.AddTransient<IUserDAO, UserLocalSqlDAO>();
             services.AddTransient<IGameBoardDAO, GameBoardLocalSqlDAO>();
+#else
+            services.AddTransient<IUserDAO, UserMySqlDAO>();
+            services.AddTransient<IGameBoardDAO, GameBoardMySqlDAO>();
+#endif
             services.AddTransient<GameboardBusinessService, GameboardBusinessService>();
             services.AddTransient<SavingLoadingService, SavingLoadingService>();
             services.AddTransient<LoginBusinessService, LoginBusinessService>();

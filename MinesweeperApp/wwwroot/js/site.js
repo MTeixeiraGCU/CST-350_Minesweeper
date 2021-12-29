@@ -47,7 +47,7 @@ function doButtonUpdate(buttonNumber, urlString, cellCallback) {
     });
 };
 
-//callback method to process all revealed cells for a given move. Must be preformed before win logic can proceed.
+//callback method to process all revealed cells for a given move. Must be preformed before win/loss logic can proceed.
 function updateCells(cells) {
 
     //setup for detecting completion of updates
@@ -65,22 +65,25 @@ function updateCells(cells) {
 //this method produces a partial page load on the given button.
 function updateCell(buttonNumber) {
     return $.ajax({
-        type: 'GET',
-        dataType: "text",
-        url: "/game/UpdateOneCell",
-        data: {
-            "buttonNumber": buttonNumber
-        },
-        success: function (data) {
+            type: 'GET',
+            dataType: "text",
+            url: "/game/UpdateOneCell",
+            data: {
+                "buttonNumber": buttonNumber
+            },
+            success: function (data) {
+                return data;
+            },
+            error: function (jq, textError, errorMsg) {
+                console.log(textError + " : " + errorMsg);
+            },
+            timeout: 1000
+        })
+        .then(function (data) {
             console.log("Cell: " + buttonNumber + " was Updated!");
             console.log(data);
             $('#' + buttonNumber).html(data);
-        },
-        error: function (jq, textError, errorMsg) {
-            console.log(textError + " : " + errorMsg);
-        },
-        timeout: 1000
-    });
+        });
 }
 
 //checks for a win condition on the game board
