@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MinesweeperApp.BusinessServices;
 using MinesweeperApp.Models;
+using MinesweeperApp.Utility;
+using NLog;
 
 namespace MinesweeperApp.Controllers
 {
@@ -33,6 +35,7 @@ namespace MinesweeperApp.Controllers
         /// <param name="user">The user information recieved from the request.</param>
         /// <returns>A view based on failure or success of the login attempt.</returns>
         [CustomAuthorization(LogOutRequired = true)]
+        [LoginActionFilter]
         public IActionResult ProcessLogin(User user)
         {
             //validate the user
@@ -45,10 +48,14 @@ namespace MinesweeperApp.Controllers
                 HttpContext.Session.SetInt32("userId", user.Id);
                 HttpContext.Session.SetString("username", user.Username);
 
+                // log username and session ID 
+                MyLogger.GetInstance().Info("Login successful: " + user.Username + " | Session ID: " + HttpContext.Session.Id);
+
                 return View("LoginSuccess", user);
             }
             else
             {
+                MyLogger.GetInstance().Info("Login failure!");
                 return View("LoginFailure", user);
             }
         }
@@ -60,7 +67,6 @@ namespace MinesweeperApp.Controllers
         [CustomAuthorization(LogOutRequired = false)]
         public IActionResult Logout()
         {
-
             return View();
         }
 
@@ -71,12 +77,18 @@ namespace MinesweeperApp.Controllers
         [CustomAuthorization(LogOutRequired = false)]
         public IActionResult ProcessLogout()
         {
+            MyLogger.GetInstance().Info("Entering ProcessLogout");
+
             if (HttpContext.Session.GetInt32("userId") != null)
             {
+                // log username and user id being logged out
+                MyLogger.GetInstance().Info("Logout user: Username: " + HttpContext.Session.GetString("username") + " | User ID: " + HttpContext.Session.GetInt32("userId"));
+
                 //remove session variables
                 HttpContext.Session.Remove("userId");
                 HttpContext.Session.Remove("username");
             }
+            MyLogger.GetInstance().Info("Exiting ProcessLogout");
             return View("Index");
         }
     }

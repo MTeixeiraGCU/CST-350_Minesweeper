@@ -63,6 +63,11 @@ namespace MinesweeperApp.Models
         public User()
         {
         }
+
+        public override string ToString()
+        {
+            return "Username: " + Username + " Password: " + Password + " User ID: " + Id;
+        }
     }
 
     /// <summary>

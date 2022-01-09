@@ -8,10 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\wiseb\.nuget\packages\nlog.config\4.7.13\contentFiles\any\any\NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\wiseb\.nuget\packages\nlog.config\4.7.13\contentFiles\any\any\NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
     <PackageReference Include="MySqlConnector" Version="2.1.1" />
+    <PackageReference Include="NLog" Version="4.7.13" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
