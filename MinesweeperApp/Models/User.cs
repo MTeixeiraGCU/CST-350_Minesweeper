@@ -9,7 +9,7 @@ namespace MinesweeperApp.Models
     /// </summary>
     public class User
     {
-        //The uniques Id for this user
+        //The unique Id for this user
         public int Id { get; set; }
 
         //The user's First Name
@@ -64,6 +64,10 @@ namespace MinesweeperApp.Models
         {
         }
 
+        /// <summary>
+        /// ToString override needed to assist in logs
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return "Username: " + Username + " Password: " + Password + " User ID: " + Id;

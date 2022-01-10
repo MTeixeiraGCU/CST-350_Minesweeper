@@ -55,7 +55,9 @@ namespace MinesweeperApp.Controllers
             }
             else
             {
+                // logging call to log failure
                 MyLogger.GetInstance().Info("Login failure!");
+
                 return View("LoginFailure", user);
             }
         }
@@ -77,6 +79,7 @@ namespace MinesweeperApp.Controllers
         [CustomAuthorization(LogOutRequired = false)]
         public IActionResult ProcessLogout()
         {
+            // logging call for logout 
             MyLogger.GetInstance().Info("Entering ProcessLogout");
 
             if (HttpContext.Session.GetInt32("userId") != null)
@@ -88,7 +91,9 @@ namespace MinesweeperApp.Controllers
                 HttpContext.Session.Remove("userId");
                 HttpContext.Session.Remove("username");
             }
+            // logging call
             MyLogger.GetInstance().Info("Exiting ProcessLogout");
+
             return View("Index");
         }
     }
